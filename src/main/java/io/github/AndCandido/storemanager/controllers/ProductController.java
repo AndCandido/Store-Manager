@@ -1,0 +1,54 @@
+package io.github.AndCandido.storemanager.controllers;
+
+
+import io.github.AndCandido.storemanager.dtos.ProductDto;
+import io.github.AndCandido.storemanager.models.ProductModel;
+import io.github.AndCandido.storemanager.services.IProductService;
+import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.UUID;
+
+@RestController
+@RequestMapping("/products")
+public class ProductController {
+
+    @Autowired
+    private IProductService productService;
+
+    @PostMapping
+    public ResponseEntity<ProductModel> saveProduct(@RequestBody @Valid ProductDto productDto) {
+        ProductModel productSaved = productService.saveProduct(productDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(productSaved);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<ProductModel>> getAllProducts() {
+        List<ProductModel> products = productService.getAllProducts();
+        return ResponseEntity.status(HttpStatus.CREATED).body(products);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ProductModel> getProductById(@PathVariable UUID id) {
+        ProductModel product = productService.getProductById(id);
+        return ResponseEntity.ok(product);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ProductModel> updateProduct(
+            @PathVariable UUID id, @RequestBody ProductDto productDto
+    ) {
+        ProductModel product = productService.updateProduct(productDto, id);
+        return ResponseEntity.status(HttpStatus.CREATED).body(product);
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteProduct(@PathVariable UUID id) {
+        productService.deleteProduct(id);
+    }
+}

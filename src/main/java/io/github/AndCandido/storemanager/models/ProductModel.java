@@ -3,7 +3,6 @@ package io.github.AndCandido.storemanager.models;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.validator.constraints.CodePointLength;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -11,13 +10,13 @@ import java.util.UUID;
 
 @Entity(name = "TB_PRODUCTS")
 @Data
-public class Product {
+public class ProductModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
-    @Column(nullable = false, length = 40)
+    @Column(nullable = false, length = 50)
     private String name;
 
     private String description;

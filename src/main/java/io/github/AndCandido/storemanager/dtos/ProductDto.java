@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 
 public record ProductDto(
         @NotBlank(message = "{product.field.name.blank}")
-        @Length(max = 40, message = "{product.field.name.max}")
+        @Length(max = 50, message = "{product.field.name.max}")
         String name,
         String description,
         @NotNull(message = "{product.field.price.null}")
