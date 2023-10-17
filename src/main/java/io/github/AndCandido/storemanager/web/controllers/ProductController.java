@@ -29,7 +29,10 @@ public class ProductController {
     @GetMapping
     public ResponseEntity<List<ProductModel>> getAllProducts() {
         List<ProductModel> products = productService.getAllProducts();
-        return ResponseEntity.status(HttpStatus.CREATED).body(products);
+
+        HttpStatus httpStatus = products.isEmpty() ? HttpStatus.NO_CONTENT : HttpStatus.OK;
+
+        return ResponseEntity.status(httpStatus).body(products);
     }
 
     @GetMapping("/{id}")
@@ -40,7 +43,7 @@ public class ProductController {
 
     @PutMapping("/{id}")
     public ResponseEntity<ProductModel> updateProduct(
-            @PathVariable UUID id, @RequestBody @Valid ProductDto productDto
+            @RequestBody @Valid ProductDto productDto, @PathVariable UUID id
     ) {
         ProductModel product = productService.updateProduct(productDto, id);
         return ResponseEntity.status(HttpStatus.CREATED).body(product);

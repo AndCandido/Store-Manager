@@ -29,9 +29,7 @@ public class CustomerController {
     public ResponseEntity<List<CustomerModel>> getAllCustomers() {
         List<CustomerModel> customers = customerService.getAllCustomers();
 
-        boolean isCustomersEmpty = customers.size() < 1;
-
-        var httpStatus = isCustomersEmpty ? HttpStatus.NO_CONTENT : HttpStatus.OK;
+        var httpStatus = customers.isEmpty() ? HttpStatus.NO_CONTENT : HttpStatus.OK;
 
         return ResponseEntity.status(httpStatus).body(customers);
     }
