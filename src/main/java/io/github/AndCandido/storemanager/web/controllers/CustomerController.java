@@ -1,14 +1,12 @@
 package io.github.AndCandido.storemanager.web.controllers;
 
 import io.github.AndCandido.storemanager.domain.dtos.CustomerDto;
-import io.github.AndCandido.storemanager.domain.dtos.groups.UpdateValidation;
 import io.github.AndCandido.storemanager.domain.models.CustomerModel;
 import io.github.AndCandido.storemanager.domain.services.ICustomerService;
 import jakarta.validation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -48,7 +46,7 @@ public class CustomerController {
 
     @PutMapping("/{id}")
     public ResponseEntity<CustomerModel> updateCustomer(
-            @RequestBody @Validated(UpdateValidation.class) CustomerDto customerDto,
+            @RequestBody @Valid CustomerDto customerDto,
             @PathVariable UUID id
     ) {
         CustomerModel customer = customerService.updateCustomer(customerDto, id);
