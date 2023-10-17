@@ -1,6 +1,6 @@
-package io.github.AndCandido.storemanager.advice;
+package io.github.AndCandido.storemanager.web.advice;
 
-import io.github.AndCandido.storemanager.exceptions.ResourceNotFoundException;
+import io.github.AndCandido.storemanager.api.exceptions.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;

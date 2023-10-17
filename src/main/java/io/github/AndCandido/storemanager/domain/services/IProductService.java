@@ -1,7 +1,7 @@
-package io.github.AndCandido.storemanager.services;
+package io.github.AndCandido.storemanager.domain.services;
 
-import io.github.AndCandido.storemanager.dtos.ProductDto;
-import io.github.AndCandido.storemanager.models.ProductModel;
+import io.github.AndCandido.storemanager.domain.dtos.ProductDto;
+import io.github.AndCandido.storemanager.domain.models.ProductModel;
 
 import java.util.List;
 import java.util.UUID;

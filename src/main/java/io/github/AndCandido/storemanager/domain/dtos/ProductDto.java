@@ -1,4 +1,4 @@
-package io.github.AndCandido.storemanager.dtos;
+package io.github.AndCandido.storemanager.domain.dtos;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

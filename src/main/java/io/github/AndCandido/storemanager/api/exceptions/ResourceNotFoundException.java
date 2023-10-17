@@ -1,4 +1,4 @@
-package io.github.AndCandido.storemanager.exceptions;
+package io.github.AndCandido.storemanager.api.exceptions;
 
 public class ResourceNotFoundException extends RuntimeException{
 

@@ -1,17 +1,16 @@
-package io.github.AndCandido.storemanager.services.impl;
+package io.github.AndCandido.storemanager.domain.services.impl;
 
+import io.github.AndCandido.storemanager.domain.services.IProductService;
 import io.github.AndCandido.storemanager.utils.ApplicationUtils;
-import io.github.AndCandido.storemanager.dtos.ProductDto;
-import io.github.AndCandido.storemanager.exceptions.ResourceNotFoundException;
-import io.github.AndCandido.storemanager.models.ProductModel;
-import io.github.AndCandido.storemanager.repositories.IProductRepository;
-import io.github.AndCandido.storemanager.services.IProductService;
+import io.github.AndCandido.storemanager.domain.dtos.ProductDto;
+import io.github.AndCandido.storemanager.api.exceptions.ResourceNotFoundException;
+import io.github.AndCandido.storemanager.domain.models.ProductModel;
+import io.github.AndCandido.storemanager.domain.repositories.IProductRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service

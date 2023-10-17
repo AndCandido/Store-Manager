@@ -29,5 +29,4 @@ public class ApplicationUtils {
         String[] result = new String[emptyProps.size()];
         return emptyProps.toArray(result);
     }
-
 }

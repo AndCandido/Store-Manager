@@ -1,9 +1,9 @@
-package io.github.AndCandido.storemanager.controllers;
+package io.github.AndCandido.storemanager.web.controllers;
 
 
-import io.github.AndCandido.storemanager.dtos.ProductDto;
-import io.github.AndCandido.storemanager.models.ProductModel;
-import io.github.AndCandido.storemanager.services.IProductService;
+import io.github.AndCandido.storemanager.domain.dtos.ProductDto;
+import io.github.AndCandido.storemanager.domain.models.ProductModel;
+import io.github.AndCandido.storemanager.domain.services.IProductService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -40,7 +40,7 @@ public class ProductController {
 
     @PutMapping("/{id}")
     public ResponseEntity<ProductModel> updateProduct(
-            @PathVariable UUID id, @RequestBody ProductDto productDto
+            @PathVariable UUID id, @RequestBody @Valid ProductDto productDto
     ) {
         ProductModel product = productService.updateProduct(productDto, id);
         return ResponseEntity.status(HttpStatus.CREATED).body(product);
