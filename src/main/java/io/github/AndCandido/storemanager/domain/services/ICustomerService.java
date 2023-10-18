@@ -17,4 +17,6 @@ public interface ICustomerService {
     CustomerModel updateCustomer(CustomerDto customerDto, UUID id);
 
     void deleteCustomer(UUID id);
+
+    boolean customerExists(UUID id);
 }

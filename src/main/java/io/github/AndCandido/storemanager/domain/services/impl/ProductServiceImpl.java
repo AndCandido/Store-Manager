@@ -58,4 +58,8 @@ public class ProductServiceImpl implements IProductService {
 
         return product;
     }
+
+    public boolean productExists(UUID id) {
+        return productRepository.existsById(id);
+    }
 }

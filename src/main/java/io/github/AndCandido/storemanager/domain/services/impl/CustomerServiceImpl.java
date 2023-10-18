@@ -56,4 +56,8 @@ public class CustomerServiceImpl implements ICustomerService {
 
         return customer;
     }
+
+    public boolean customerExists(UUID id) {
+        return customerRepository.existsById(id);
+    }
 }
