@@ -25,8 +25,8 @@ public class SaleModel {
 
     private UUID clientId;
 
-    @Column(nullable = false)
-    private List<UUID> productsId;
+    @ManyToMany
+    private List<ProductModel> products;
 
     @CreationTimestamp
     private LocalDateTime createdAt;

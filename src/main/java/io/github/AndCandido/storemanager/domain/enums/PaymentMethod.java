@@ -21,15 +21,13 @@ public enum PaymentMethod {
         return value;
     }
 
-
-
-//    @JsonCreator
-//    public static PaymentMethod fromString(String value) {
-//        for (PaymentMethod paymentMethod : PaymentMethod.values()) {
-//            if (paymentMethod.name().equalsIgnoreCase(value)) {
-//                return paymentMethod;
-//            }
-//        }
-//        throw new IllegalArgumentException("Método de pagamento inválido");
-//    }
+    @JsonCreator
+    public static PaymentMethod fromString(String value) {
+        for (PaymentMethod paymentMethod : PaymentMethod.values()) {
+            if (paymentMethod.name().equalsIgnoreCase(value)) {
+                return paymentMethod;
+            }
+        }
+        throw new IllegalArgumentException("Método de pagamento inválido");
+    }
 }

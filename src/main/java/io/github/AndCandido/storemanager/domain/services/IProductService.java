@@ -15,7 +15,7 @@ public interface IProductService {
 
     ProductModel updateProduct(ProductDto productDto, UUID id);
 
-    void deleteProduct(UUID id);
+    ProductModel updateProduct(ProductModel productModel);
 
-    boolean productExists(UUID id);
+    void deleteProduct(UUID id);
 }

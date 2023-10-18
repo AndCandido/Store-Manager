@@ -35,13 +35,17 @@ public class ProductServiceImpl implements IProductService {
 
     @Override
     public ProductModel updateProduct(ProductDto productDto, UUID id) {
-
         ProductModel productFound = getProductById(id);
 
         ApplicationUtils.copyNonNullProperties(productDto, productFound);
 
         ProductModel productSaved = productRepository.save(productFound);
         return productSaved;
+    }
+
+    @Override
+    public ProductModel updateProduct(ProductModel productModel) {
+        return productRepository.save(productModel);
     }
 
     @Override
@@ -57,9 +61,5 @@ public class ProductServiceImpl implements IProductService {
                 .orElseThrow(() -> new ResourceNotFoundException("Produto não encontrado"));
 
         return product;
-    }
-
-    public boolean productExists(UUID id) {
-        return productRepository.existsById(id);
     }
 }
