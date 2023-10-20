@@ -29,7 +29,7 @@ public class SaleModel {
     private CustomerModel customer;
 
     @OneToMany
-    private List<ProductSoldModel> productsSold = new ArrayList<>();
+    List<ProductSoldModel> productsSold = new ArrayList<>();
 
     @Column(nullable = false)
     private BigDecimal price;

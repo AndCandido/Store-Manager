@@ -17,6 +17,4 @@ public interface IProductService {
     ProductModel updateProduct(ProductModel productModel);
 
     void deleteProduct(Long id);
-
-    List<ProductModel> updateAllProducts(List<ProductModel> productsModel);
 }

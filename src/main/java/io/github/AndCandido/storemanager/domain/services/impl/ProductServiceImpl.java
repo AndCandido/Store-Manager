@@ -61,9 +61,4 @@ public class ProductServiceImpl implements IProductService {
 
         return product;
     }
-
-    @Override
-    public List<ProductModel> updateAllProducts(List<ProductModel> productsModel) {
-        return productRepository.saveAll(productsModel);
-    }
 }

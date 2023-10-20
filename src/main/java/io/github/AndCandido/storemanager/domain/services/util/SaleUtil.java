@@ -12,17 +12,16 @@ import io.github.AndCandido.storemanager.domain.services.IProductService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class SaleUtil {
-
     private IProductSoldRepository productSoldRepository;
     private ICustomerService customerService;
     private IProductService productService;
 
-    SaleUtil(IProductSoldRepository productSoldRepository,
+    public SaleUtil(IProductSoldRepository productSoldRepository,
              ICustomerService customerService,
              IProductService productService
     ) {
@@ -34,8 +33,7 @@ public class SaleUtil {
     public void handlerSetSaleModel(SaleDto saleDto, SaleModel saleModel) {
         BeanUtils.copyProperties(saleDto, saleModel);
 
-        for (int i = 0; i < saleDto.productsSold().size(); i++) {
-            var productSoldDto = saleDto.productsSold().get(i);
+        for (ProductSoldDto productSoldDto : saleDto.productsSold()) {
             var productSoldModel = new ProductSoldModel();
             setModelProperties(productSoldModel, productSoldDto);
             saleModel.getProductsSold().add(productSoldModel);
@@ -46,6 +44,47 @@ public class SaleUtil {
         }
 
         productSoldRepository.saveAll(saleModel.getProductsSold());
+    }
+
+    public void handlerUpdateSaleModel(SaleDto saleDto, SaleModel saleModel) {
+        BeanUtils.copyProperties(saleDto, saleModel);
+
+        Map<Long, ProductModel> originalProducts = new HashMap<>();
+
+        saleModel.getProductsSold().forEach(productSoldModel -> {
+            var product = productSoldModel.getProductModel();
+            var stockQuantity = product.getStockQuantity();
+            var quantitySold = productSoldModel.getQuantity();
+
+            product.setStockQuantity(stockQuantity + quantitySold);
+            originalProducts.put(product.getId(), product);
+        });
+
+        saleModel.getProductsSold().clear();
+
+        for (ProductSoldDto productSoldDto : saleDto.productsSold()) {
+            var productSoldModel = new ProductSoldModel();
+
+            setModelProperties(productSoldModel, productSoldDto);
+            saleModel.getProductsSold().add(productSoldModel);
+        }
+
+        for (ProductSoldModel productSoldModel : saleModel.getProductsSold()) {
+            var product = productSoldModel.getProductModel();
+
+            if(originalProducts.containsKey(product.getId())) {
+                productSoldModel.setProductModel(originalProducts.get(product.getId()));
+            }
+
+            updateProductStockQuantity(productSoldModel);
+        }
+
+        productSoldRepository.saveAll(saleModel.getProductsSold());
+
+        saleModel.getProductsSold().forEach(productSoldModel -> {
+            var product = productSoldModel.getProductModel();
+            productService.updateProduct(product);
+        });
     }
 
     private void setModelProperties(
@@ -82,9 +121,5 @@ public class SaleUtil {
                     "Não há quantidade em estoque o suficiente de "+productName+", há somente "+ stockQuantity + " unidade(s)"
             );
         }
-    }
-
-    public void handlerUpdateSaleModel(SaleDto saleDto, SaleModel saleModel) {
-
     }
 }
