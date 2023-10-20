@@ -4,18 +4,19 @@ import io.github.AndCandido.storemanager.domain.dtos.ProductDto;
 import io.github.AndCandido.storemanager.domain.models.ProductModel;
 
 import java.util.List;
-import java.util.UUID;
 
 public interface IProductService {
     ProductModel saveProduct(ProductDto productDto);
 
     List<ProductModel> getAllProducts();
 
-    ProductModel getProductById(UUID id);
+    ProductModel getProductById(Long id);
 
-    ProductModel updateProduct(ProductDto productDto, UUID id);
+    ProductModel updateProduct(ProductDto productDto, Long id);
 
     ProductModel updateProduct(ProductModel productModel);
 
-    void deleteProduct(UUID id);
+    void deleteProduct(Long id);
+
+    List<ProductModel> updateAllProducts(List<ProductModel> productsModel);
 }

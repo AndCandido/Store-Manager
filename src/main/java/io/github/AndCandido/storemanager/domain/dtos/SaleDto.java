@@ -1,17 +1,17 @@
 package io.github.AndCandido.storemanager.domain.dtos;
 
-import io.github.AndCandido.storemanager.api.request.ProductSold;
 import io.github.AndCandido.storemanager.domain.enums.PaymentMethod;
+import io.github.AndCandido.storemanager.domain.models.CustomerModel;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
 public record SaleDto(
-
         @NotNull(message = "{sale.field.duplication.null}")
         @Min(value = 1, message = "{sale.field.duplication.min}")
         Short duplication,
@@ -19,9 +19,13 @@ public record SaleDto(
         @NotNull(message = "{sale.field.paymentMethod.blank}")
         PaymentMethod paymentMethod,
 
-        UUID clientId,
+        CustomerModel customer,
 
         @NotEmpty(message = "{sale.field.productsSold.empty}")
-        List<@Valid ProductSold> productsSold
+        List<@Valid ProductSoldDto> productsSold,
+
+        @NotNull(message = "{sale.field.price.null}")
+        @Min(value = 0, message = "{sale.field.price.min}")
+        BigDecimal price
 ) {
 }

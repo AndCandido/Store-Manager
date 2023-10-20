@@ -1,38 +1,28 @@
 package io.github.AndCandido.storemanager.domain.models;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Entity(name = "TB_PRODUCTS")
 @Data
 public class ProductModel {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @Column(nullable = false, length = 50)
     private String name;
-
-    private String description;
 
     @Column(nullable = false)
     private BigDecimal price;
 
     @Column(nullable = false)
     private Integer stockQuantity;
-
-    @Column(nullable = false)
-    private Integer code;
-
-    private Integer ref;
 
     @CreationTimestamp
     private LocalDateTime createdAt;

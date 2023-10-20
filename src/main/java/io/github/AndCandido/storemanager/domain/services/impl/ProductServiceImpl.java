@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.UUID;
 
 @Service
 public class ProductServiceImpl implements IProductService {
@@ -34,7 +33,7 @@ public class ProductServiceImpl implements IProductService {
     }
 
     @Override
-    public ProductModel updateProduct(ProductDto productDto, UUID id) {
+    public ProductModel updateProduct(ProductDto productDto, Long id) {
         ProductModel productFound = getProductById(id);
 
         ApplicationUtils.copyNonNullProperties(productDto, productFound);
@@ -49,17 +48,22 @@ public class ProductServiceImpl implements IProductService {
     }
 
     @Override
-    public void deleteProduct(UUID id) {
+    public void deleteProduct(Long id) {
         ProductModel product = getProductById(id);
         productRepository.delete(product);
     }
 
     @Override
-    public ProductModel getProductById(UUID id) {
+    public ProductModel getProductById(Long id) {
         ProductModel product = productRepository
                 .findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Produto não encontrado"));
 
         return product;
+    }
+
+    @Override
+    public List<ProductModel> updateAllProducts(List<ProductModel> productsModel) {
+        return productRepository.saveAll(productsModel);
     }
 }

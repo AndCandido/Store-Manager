@@ -1,14 +1,10 @@
-package io.github.AndCandido.storemanager.api.request;
+package io.github.AndCandido.storemanager.domain.dtos;
 
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-
-import java.util.UUID;
-
-public record ProductSold(
+public record ProductSoldDto(
         @NotNull(message = "{productSold.field.id.null}")
-        UUID id,
+        Long productId,
 
         @NotNull(message = "{productSold.field.quantity.null}")
         @Min(value = 1, message = "{productSold.field.quantity.min}")

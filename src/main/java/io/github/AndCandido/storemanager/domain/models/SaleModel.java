@@ -5,7 +5,9 @@ import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -23,12 +25,15 @@ public class SaleModel {
     @Column(nullable = false)
     private PaymentMethod paymentMethod;
 
-    private UUID clientId;
+    @ManyToOne
+    private CustomerModel customer;
 
-    @ManyToMany
-    private List<ProductModel> products;
+    @OneToMany
+    private List<ProductSoldModel> productsSold = new ArrayList<>();
+
+    @Column(nullable = false)
+    private BigDecimal price;
 
     @CreationTimestamp
     private LocalDateTime createdAt;
-
 }
