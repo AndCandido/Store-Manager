@@ -29,9 +29,7 @@ public class CustomerController {
     public ResponseEntity<List<CustomerModel>> getAllCustomers() {
         List<CustomerModel> customers = customerService.getAllCustomers();
 
-        var httpStatus = customers.isEmpty() ? HttpStatus.NO_CONTENT : HttpStatus.OK;
-
-        return ResponseEntity.status(httpStatus).body(customers);
+        return ResponseEntity.status(HttpStatus.OK).body(customers);
     }
 
     @GetMapping("/{id}")

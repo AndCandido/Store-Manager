@@ -30,9 +30,7 @@ public class ProductController {
     public ResponseEntity<List<ProductModel>> getAllProducts() {
         List<ProductModel> products = productService.getAllProducts();
 
-        HttpStatus httpStatus = products.isEmpty() ? HttpStatus.NO_CONTENT : HttpStatus.OK;
-
-        return ResponseEntity.status(httpStatus).body(products);
+        return ResponseEntity.status(HttpStatus.OK).body(products);
     }
 
     @GetMapping("/{id}")

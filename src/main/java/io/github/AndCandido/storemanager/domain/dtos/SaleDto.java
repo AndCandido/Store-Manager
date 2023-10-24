@@ -6,11 +6,13 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
+@Builder
 public record SaleDto(
         @NotNull(message = "{sale.field.duplication.null}")
         @Min(value = 1, message = "{sale.field.duplication.min}")

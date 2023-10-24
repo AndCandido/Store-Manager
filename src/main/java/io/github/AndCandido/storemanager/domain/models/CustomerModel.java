@@ -1,7 +1,10 @@
 package io.github.AndCandido.storemanager.domain.models;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
@@ -9,6 +12,9 @@ import java.util.UUID;
 
 @Entity(name = "TB_CUSTOMERS")
 @Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class CustomerModel {
 
     @Id

@@ -1,9 +1,11 @@
 package io.github.AndCandido.storemanager.domain.dtos;
 
 import jakarta.validation.constraints.NotBlank;
+import lombok.Builder;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.br.CPF;
 
+@Builder
 public record CustomerDto(
 
         @NotBlank(message = "{customer.field.name.blank}")

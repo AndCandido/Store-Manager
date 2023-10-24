@@ -1,7 +1,10 @@
 package io.github.AndCandido.storemanager.domain.models;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
@@ -9,6 +12,9 @@ import java.time.LocalDateTime;
 
 @Entity(name = "TB_PRODUCTS")
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ProductModel {
 
     @Id

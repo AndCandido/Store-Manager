@@ -31,9 +31,7 @@ public class SaleController {
     public ResponseEntity<List<SaleModel>> getAllSales() {
         List<SaleModel> sales = saleService.getAllSales();
 
-        HttpStatus httpStatus = sales.isEmpty() ? HttpStatus.NO_CONTENT : HttpStatus.OK;
-
-        return ResponseEntity.status(httpStatus).body(sales);
+        return ResponseEntity.status(HttpStatus.OK).body(sales);
     }
 
     @GetMapping("/{id}")

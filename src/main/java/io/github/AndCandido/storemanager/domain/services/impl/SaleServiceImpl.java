@@ -5,7 +5,7 @@ import io.github.AndCandido.storemanager.domain.dtos.SaleDto;
 import io.github.AndCandido.storemanager.domain.models.SaleModel;
 import io.github.AndCandido.storemanager.domain.repositories.ISaleRepository;
 import io.github.AndCandido.storemanager.domain.services.ISaleService;
-import io.github.AndCandido.storemanager.domain.services.util.SaleUtil;
+import io.github.AndCandido.storemanager.utils.SaleUtil;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

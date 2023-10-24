@@ -1,4 +1,4 @@
-package io.github.AndCandido.storemanager.domain.services.util;
+package io.github.AndCandido.storemanager.utils;
 
 import io.github.AndCandido.storemanager.api.exceptions.InsufficientStockException;
 import io.github.AndCandido.storemanager.domain.dtos.ProductSoldDto;

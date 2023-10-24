@@ -2,7 +2,10 @@ package io.github.AndCandido.storemanager.domain.models;
 
 import io.github.AndCandido.storemanager.domain.enums.PaymentMethod;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
@@ -13,6 +16,9 @@ import java.util.UUID;
 
 @Entity(name = "TB_SALES")
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class SaleModel {
 
     @Id

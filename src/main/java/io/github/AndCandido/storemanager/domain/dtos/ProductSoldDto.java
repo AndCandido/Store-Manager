@@ -2,6 +2,9 @@ package io.github.AndCandido.storemanager.domain.dtos;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
+
+@Builder
 public record ProductSoldDto(
         @NotNull(message = "{productSold.field.id.null}")
         Long productId,
