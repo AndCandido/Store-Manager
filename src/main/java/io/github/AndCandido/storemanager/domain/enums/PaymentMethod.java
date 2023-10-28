@@ -2,6 +2,7 @@ package io.github.AndCandido.storemanager.domain.enums;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import io.github.AndCandido.storemanager.api.exceptions.InvalidPaymentMethodException;
 
 public enum PaymentMethod {
     MONEY("money"),
@@ -28,6 +29,6 @@ public enum PaymentMethod {
                 return paymentMethod;
             }
         }
-        throw new IllegalArgumentException("Método de pagamento inválido");
+        throw new InvalidPaymentMethodException("Método de pagamento inválido");
     }
 }

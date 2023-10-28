@@ -7,15 +7,17 @@ import io.github.AndCandido.storemanager.domain.repositories.IProductSoldReposit
 import io.github.AndCandido.storemanager.domain.services.IProductSoldService;
 import jakarta.validation.Valid;
 import org.springframework.beans.BeanUtils;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
 
-public class ProductSoldImpl implements IProductSoldService {
+@Service
+public class ProductSoldServiceImpl implements IProductSoldService {
 
     private IProductSoldRepository productSoldRepository;
 
-    public ProductSoldImpl(IProductSoldRepository productSoldRepository) {
+    public ProductSoldServiceImpl(IProductSoldRepository productSoldRepository) {
         this.productSoldRepository = productSoldRepository;
     }
 
@@ -26,6 +28,16 @@ public class ProductSoldImpl implements IProductSoldService {
         BeanUtils.copyProperties(productSoldDto, productSoldModel);
 
         return productSoldRepository.save(productSoldModel);
+    }
+
+    @Override
+    public ProductSoldModel saveProductSold(ProductSoldModel productSoldModel) {
+        return productSoldRepository.save(productSoldModel);
+    }
+
+    @Override
+    public List<ProductSoldModel> saveAllProductsSold(List<ProductSoldModel> productSoldModel) {
+        return productSoldRepository.saveAll(productSoldModel);
     }
 
     @Override

@@ -9,6 +9,10 @@ import java.util.UUID;
 public interface IProductSoldService {
     ProductSoldModel saveProductSold(ProductSoldDto productSoldDto);
 
+    ProductSoldModel saveProductSold(ProductSoldModel productSoldModel);
+
+    List<ProductSoldModel> saveAllProductsSold(List<ProductSoldModel> productSoldModel);
+
     List<ProductSoldModel> getProductsSold();
 
     ProductSoldModel getProductSoldById(UUID id);

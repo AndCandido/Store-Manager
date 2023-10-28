@@ -34,8 +34,8 @@ public class SaleModel {
     @ManyToOne
     private CustomerModel customer;
 
-    @OneToMany
-    List<ProductSoldModel> productsSold = new ArrayList<>();
+    @OneToMany(mappedBy = "sale")
+    private List<ProductSoldModel> productsSold = new ArrayList<>();
 
     @Column(nullable = false)
     private BigDecimal price;

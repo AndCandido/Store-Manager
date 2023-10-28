@@ -1,7 +1,6 @@
 package io.github.AndCandido.storemanager.domain.services.impl;
 
 import io.github.AndCandido.storemanager.domain.services.IProductService;
-import io.github.AndCandido.storemanager.utils.ApplicationUtils;
 import io.github.AndCandido.storemanager.domain.dtos.ProductDto;
 import io.github.AndCandido.storemanager.api.exceptions.ResourceNotFoundException;
 import io.github.AndCandido.storemanager.domain.models.ProductModel;
@@ -36,7 +35,7 @@ public class ProductServiceImpl implements IProductService {
     public ProductModel updateProduct(ProductDto productDto, Long id) {
         ProductModel productFound = getProductById(id);
 
-        ApplicationUtils.copyNonNullProperties(productDto, productFound);
+        BeanUtils.copyProperties(productDto, productFound);
 
         ProductModel productSaved = productRepository.save(productFound);
         return productSaved;
