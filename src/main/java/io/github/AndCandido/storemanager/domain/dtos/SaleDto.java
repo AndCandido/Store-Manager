@@ -9,6 +9,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Builder
 public record SaleDto(
@@ -22,7 +23,7 @@ public record SaleDto(
         CustomerModel customer,
 
         @NotEmpty(message = "{sale.field.productsSold.empty}")
-        @Valid ProductSoldDto[] productsSold,
+        @Valid List<ProductSoldDto> productsSold,
 
         @NotNull(message = "{sale.field.price.null}")
         @Min(value = 0, message = "{sale.field.price.min}")

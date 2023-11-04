@@ -34,7 +34,7 @@ public class SaleServiceImpl implements ISaleService {
     @Transactional
     public SaleModel saveSale(SaleDto saleDto) {
         var saleModel = createSaleModel(saleDto);
-        var saleSaved = saleRepository.save(saleModel);
+        saleModel = saleRepository.save(saleModel);
 
         for (ProductSoldDto productSoldDto : saleDto.productsSold()) {
             var quantitySold = productSoldDto.quantity();
@@ -42,10 +42,10 @@ public class SaleServiceImpl implements ISaleService {
             var productModel = productSoldModel.getProductModel();
 
             updateStockQuantityOfProduct(productModel, quantitySold);
-            persistProductAndProductSold(productModel, productSoldModel);
+            updateProduct(productModel);
         }
 
-        return saleSaved;
+        return saleModel;
     }
 
     @Override
@@ -65,6 +65,8 @@ public class SaleServiceImpl implements ISaleService {
         var saleModel = getSaleById(id);
 
         for (ProductSoldModel productSoldModel : saleModel.getProductsSold()) {
+            if(productModelIsNull(productSoldModel))
+                continue;
             var productModel = productSoldModel.getProductModel();
             incrementStockQuantityOfProduct(productModel, productSoldModel.getQuantity());
             updateProduct(productModel);
@@ -79,7 +81,7 @@ public class SaleServiceImpl implements ISaleService {
             var productModel = productSoldModel.getProductModel();
 
             updateStockQuantityOfProduct(productModel, quantitySold);
-            persistProductAndProductSold(productModel, productSoldModel);
+            updateProduct(productModel);
         }
 
         return saleRepository.save(saleModel);
@@ -90,6 +92,8 @@ public class SaleServiceImpl implements ISaleService {
         var saleModel = getSaleById(id);
 
         for (ProductSoldModel productSoldModel : saleModel.getProductsSold()) {
+            if(productModelIsNull(productSoldModel))
+                continue;
             var productModel = productSoldModel.getProductModel();
             incrementStockQuantityOfProduct(productModel, productSoldModel.getQuantity());
             updateProduct(productModel);
@@ -122,11 +126,6 @@ public class SaleServiceImpl implements ISaleService {
         }
 
         decrementStockQuantityProduct(productModel, quantitySold);
-    }
-
-    private void persistProductAndProductSold(ProductModel productModel, ProductSoldModel productSoldModel) {
-        updateProduct(productModel);
-        saveProductSold(productSoldModel);
     }
 
     private ProductSoldModel createProductSoldModel(ProductSoldDto productSoldDto) {
@@ -166,8 +165,8 @@ public class SaleServiceImpl implements ISaleService {
         productSoldModel.setSale(saleModel);
     }
 
-    private void saveProductSold(ProductSoldModel productSoldModel) {
-        productSoldService.saveProductSold(productSoldModel);
+    private boolean productModelIsNull(ProductSoldModel productSoldModel) {
+        return productSoldModel.getProductModel() == null;
     }
 
     private void deleteProductSold(ProductSoldModel productSoldModel) {

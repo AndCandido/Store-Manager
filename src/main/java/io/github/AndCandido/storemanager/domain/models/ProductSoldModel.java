@@ -1,6 +1,6 @@
 package io.github.AndCandido.storemanager.domain.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,17 +14,16 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class ProductSoldModel {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
     @ManyToOne
-    @JoinColumn(name = "product_id")
     private ProductModel productModel;
 
     @ManyToOne
-    @JsonIgnore
     @JoinColumn(name = "sale_id")
     private SaleModel sale;
 

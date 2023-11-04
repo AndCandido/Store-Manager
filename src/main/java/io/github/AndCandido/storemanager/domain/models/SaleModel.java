@@ -1,5 +1,7 @@
 package io.github.AndCandido.storemanager.domain.models;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import io.github.AndCandido.storemanager.domain.enums.PaymentMethod;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -7,7 +9,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -19,7 +20,8 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SaleModel {
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+public class SaleModel  {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -34,7 +36,7 @@ public class SaleModel {
     @ManyToOne
     private CustomerModel customer;
 
-    @OneToMany(mappedBy = "sale")
+    @OneToMany(mappedBy = "sale", cascade = CascadeType.ALL)
     private List<ProductSoldModel> productsSold = new ArrayList<>();
 
     @Column(nullable = false)
@@ -42,4 +44,6 @@ public class SaleModel {
 
     @CreationTimestamp
     private LocalDateTime createdAt;
+
+
 }
