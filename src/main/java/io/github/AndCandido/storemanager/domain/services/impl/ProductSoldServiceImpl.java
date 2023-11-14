@@ -2,6 +2,7 @@ package io.github.AndCandido.storemanager.domain.services.impl;
 
 import io.github.AndCandido.storemanager.api.exceptions.ResourceNotFoundException;
 import io.github.AndCandido.storemanager.domain.dtos.ProductSoldDto;
+import io.github.AndCandido.storemanager.domain.models.ProductModel;
 import io.github.AndCandido.storemanager.domain.models.ProductSoldModel;
 import io.github.AndCandido.storemanager.domain.repositories.IProductSoldRepository;
 import io.github.AndCandido.storemanager.domain.services.IProductSoldService;
@@ -22,36 +23,9 @@ public class ProductSoldServiceImpl implements IProductSoldService {
     }
 
     @Override
-    public ProductSoldModel saveProductSold(@Valid ProductSoldDto productSoldDto) {
-        var productSoldModel = new ProductSoldModel();
-
-        BeanUtils.copyProperties(productSoldDto, productSoldModel);
-
-        return productSoldRepository.save(productSoldModel);
-    }
-
-    @Override
-    public ProductSoldModel saveProductSold(ProductSoldModel productSoldModel) {
-        return productSoldRepository.save(productSoldModel);
-    }
-
-    @Override
-    public List<ProductSoldModel> saveAllProductsSold(List<ProductSoldModel> productSoldModel) {
-        return productSoldRepository.saveAll(productSoldModel);
-    }
-
-    @Override
-    public List<ProductSoldModel> getProductsSold() {
-        return productSoldRepository.findAll();
-    }
-
-    @Override
-    public ProductSoldModel updateProductSold(ProductSoldDto productSoldDto, UUID id) {
-        var productSoldModel = getProductSoldById(id);
-
-        BeanUtils.copyProperties(productSoldDto, productSoldModel);
-
-        return productSoldRepository.save(productSoldModel);
+    public List<ProductSoldModel> getProductSoldByProduct(ProductModel productModel) {
+        var productsSoldModel = productSoldRepository.findByProductModel(productModel);
+        return productsSoldModel;
     }
 
     @Override

@@ -1,6 +1,5 @@
 package io.github.AndCandido.storemanager.domain.models;
 
-import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,7 +13,6 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class ProductSoldModel {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

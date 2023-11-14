@@ -7,7 +7,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.List;
@@ -34,8 +33,7 @@ public class HandlerExceptionsController {
     }
 
     @ExceptionHandler(InsufficientStockException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public String handlerInsufficientStockException(InsufficientStockException e) {
-        return e.getMessage();
+    public ResponseEntity<String> handlerInsufficientStockException(InsufficientStockException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     }
 }

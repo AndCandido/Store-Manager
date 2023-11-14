@@ -2,6 +2,7 @@ package io.github.AndCandido.storemanager.web.controllers;
 
 
 import io.github.AndCandido.storemanager.domain.dtos.ProductDto;
+import io.github.AndCandido.storemanager.domain.mappers.ProductMapper;
 import io.github.AndCandido.storemanager.domain.models.ProductModel;
 import io.github.AndCandido.storemanager.domain.services.IProductService;
 import jakarta.validation.Valid;
@@ -10,8 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/products")
@@ -21,30 +22,40 @@ public class ProductController {
     private IProductService productService;
 
     @PostMapping
-    public ResponseEntity<ProductModel> saveProduct(@RequestBody @Valid ProductDto productDto) {
+    public ResponseEntity<ProductDto> saveProduct(@RequestBody @Valid ProductDto productDto) {
         ProductModel productSaved = productService.saveProduct(productDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(productSaved);
+        var productResponse = ProductMapper.toDto(productSaved);
+        return ResponseEntity.status(HttpStatus.CREATED).body(productResponse);
     }
 
     @GetMapping
-    public ResponseEntity<List<ProductModel>> getAllProducts() {
+    public ResponseEntity<List<ProductDto>> getAllProducts() {
         List<ProductModel> products = productService.getAllProducts();
 
-        return ResponseEntity.status(HttpStatus.OK).body(products);
+        if(products.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.OK).body(new ArrayList<ProductDto>());
+        }
+
+        List<ProductDto> productResDtos = products.stream()
+                .map(ProductMapper::toDto).toList();
+
+        return ResponseEntity.status(HttpStatus.OK).body(productResDtos);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProductModel> getProductById(@PathVariable Long id) {
+    public ResponseEntity<ProductDto> getProductById(@PathVariable Long id) {
         ProductModel product = productService.getProductById(id);
-        return ResponseEntity.ok(product);
+        var productResponse = ProductMapper.toDto(product);
+        return ResponseEntity.ok(productResponse);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ProductModel> updateProduct(
+    public ResponseEntity<ProductDto> updateProduct(
             @RequestBody @Valid ProductDto productDto, @PathVariable Long id
     ) {
         ProductModel product = productService.updateProduct(productDto, id);
-        return ResponseEntity.status(HttpStatus.CREATED).body(product);
+        var productResponse = ProductMapper.toDto(product);
+        return ResponseEntity.status(HttpStatus.CREATED).body(productResponse);
     }
 
     @DeleteMapping("/{id}")

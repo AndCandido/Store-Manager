@@ -5,6 +5,7 @@ import io.github.AndCandido.storemanager.domain.services.ICustomerService;
 import io.github.AndCandido.storemanager.api.exceptions.ResourceNotFoundException;
 import io.github.AndCandido.storemanager.domain.models.CustomerModel;
 import io.github.AndCandido.storemanager.domain.repositories.ICustomerRepository;
+import io.github.AndCandido.storemanager.utils.ApplicationUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -36,7 +37,7 @@ public class CustomerServiceImpl implements ICustomerService {
     public CustomerModel updateCustomer(CustomerDto customerDto, UUID id) {
         CustomerModel customer = getCustomerById(id);
 
-        BeanUtils.copyProperties(customerDto, customer);
+        ApplicationUtil.copyNonNullProperties(customerDto, customer);
 
         return customerRepository.save(customer);
     }

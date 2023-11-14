@@ -4,10 +4,12 @@ import io.github.AndCandido.storemanager.api.exceptions.InsufficientStockExcepti
 import io.github.AndCandido.storemanager.api.exceptions.ResourceNotFoundException;
 import io.github.AndCandido.storemanager.domain.dtos.ProductSoldDto;
 import io.github.AndCandido.storemanager.domain.dtos.SaleDto;
+import io.github.AndCandido.storemanager.domain.models.CustomerModel;
 import io.github.AndCandido.storemanager.domain.models.ProductModel;
 import io.github.AndCandido.storemanager.domain.models.ProductSoldModel;
 import io.github.AndCandido.storemanager.domain.models.SaleModel;
 import io.github.AndCandido.storemanager.domain.repositories.ISaleRepository;
+import io.github.AndCandido.storemanager.domain.services.ICustomerService;
 import io.github.AndCandido.storemanager.domain.services.IProductService;
 import io.github.AndCandido.storemanager.domain.services.IProductSoldService;
 import io.github.AndCandido.storemanager.domain.services.ISaleService;
@@ -23,11 +25,13 @@ public class SaleServiceImpl implements ISaleService {
     private ISaleRepository saleRepository;
     private IProductService productService;
     private IProductSoldService productSoldService;
+    private ICustomerService customerService;
 
-    public SaleServiceImpl(ISaleRepository saleRepository, IProductService productService, IProductSoldService productSoldService) {
+    public SaleServiceImpl(ISaleRepository saleRepository, IProductService productService, IProductSoldService productSoldService, ICustomerService customerService) {
         this.saleRepository = saleRepository;
         this.productService = productService;
         this.productSoldService = productSoldService;
+        this.customerService = customerService;
     }
 
     @Override
@@ -35,6 +39,11 @@ public class SaleServiceImpl implements ISaleService {
     public SaleModel saveSale(SaleDto saleDto) {
         var saleModel = createSaleModel(saleDto);
         saleModel = saleRepository.save(saleModel);
+
+        var customer = saleDto.customer() == null ? null :
+                customerService.getCustomerById(saleDto.customer().id());
+
+        setCustomerOnSale(customer, saleModel);
 
         for (ProductSoldDto productSoldDto : saleDto.productsSold()) {
             var quantitySold = productSoldDto.quantity();
@@ -63,6 +72,10 @@ public class SaleServiceImpl implements ISaleService {
     @Transactional
     public SaleModel updateSale(SaleDto saleDto, UUID id) {
         var saleModel = getSaleById(id);
+
+        var customer = saleDto.customer() == null ? null :
+                customerService.getCustomerById(saleDto.customer().id());
+        setCustomerOnSale(customer, saleModel);
 
         for (ProductSoldModel productSoldModel : saleModel.getProductsSold()) {
             if(productModelIsNull(productSoldModel))
@@ -118,6 +131,10 @@ public class SaleServiceImpl implements ISaleService {
         saleModel.getProductsSold().add(productSoldModel);
 
         return productSoldModel;
+    }
+
+    private void setCustomerOnSale(CustomerModel customerModel, SaleModel saleModel) {
+        saleModel.setCustomer(customerModel);
     }
 
     private void updateStockQuantityOfProduct(ProductModel productModel, int quantitySold) {

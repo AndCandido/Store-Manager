@@ -22,7 +22,7 @@ import java.util.List;
 @AutoConfigureTestDatabase
 public class ProductIT {
 
-    private final String uri = "/products";
+    private final String URI = "/products";
 
     @Autowired
     private TestRestTemplate restTemplate;
@@ -32,13 +32,13 @@ public class ProductIT {
     @Test
     public void saveProducts_Success() {
         ProductDto[] products = {
-                ProductCreator.createProductDto("Calça", 129, 5),
-                ProductCreator.createProductDto("Camisa", 90.05, 1),
-                ProductCreator.createProductDto("Blusa", 102.99, 6)
+                ProductCreator.createDto("Calça", 129, 5),
+                ProductCreator.createDto("Camisa", 90.05, 1),
+                ProductCreator.createDto("Blusa", 102.99, 6)
         };
 
         for (ProductDto product : products) {
-            var response = restTemplate.postForEntity(uri, product, ProductModel.class);
+            var response = restTemplate.postForEntity(URI, product, ProductModel.class);
             var body = response.getBody();
 
             Assertions.assertEquals(HttpStatus.CREATED, response.getStatusCode());
@@ -57,14 +57,14 @@ public class ProductIT {
     @Test
     public void getAllProducts_Success() {
         ProductModel[] productsSaved = {
-            ProductCreator.createProductModel("Meia", 18.99, 5),
-            ProductCreator.createProductModel("Meia", 18.99, 5)
+            ProductCreator.createModel("Meia", 18.99, 5),
+            ProductCreator.createModel("Meia", 18.99, 5)
         };
 
         productRepository.saveAll(Arrays.stream(productsSaved).toList());
 
         var response = restTemplate.exchange(
-                uri,
+                URI,
                 HttpMethod.GET,
                 null,
                 new ParameterizedTypeReference<List<ProductModel>>() {}
@@ -95,7 +95,7 @@ public class ProductIT {
     @Test
     public void getAllProducts_NoContent() {
         var response = restTemplate.exchange(
-                uri,
+                URI,
                 HttpMethod.GET,
                 null,
                 new ParameterizedTypeReference<List<ProductModel>>() {}
@@ -111,10 +111,10 @@ public class ProductIT {
     @Test
     public void updateProduct_Success() {
         var productSaved = productRepository.save(
-                ProductCreator.createProductModel("Bolsa", 13, 3)
+                ProductCreator.createModel("Bolsa", 13, 3)
         );
 
-        var productForUpdate = ProductCreator.createProductDto(
+        var productForUpdate = ProductCreator.createDto(
                 "Bolsa", 13.05, 3
         );
 
@@ -144,7 +144,7 @@ public class ProductIT {
     @Test
     public void deleteProduct_Success() {
         var productSaved = productRepository.save(
-                ProductCreator.createProductModel("Meia", 12.99, 2)
+                ProductCreator.createModel("Meia", 12.99, 2)
         );
 
         var productSavedId = productSaved.getId();
@@ -162,6 +162,6 @@ public class ProductIT {
         Assertions.assertTrue(productDeletedFound.isEmpty());
     }
     private String getUriWithId(Long id) {
-        return uri + "/" + id;
+        return URI + "/" + id;
     }
 }

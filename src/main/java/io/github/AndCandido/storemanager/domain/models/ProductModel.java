@@ -1,7 +1,5 @@
 package io.github.AndCandido.storemanager.domain.models;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,7 +16,6 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class ProductModel {
 
     @Id
@@ -42,6 +39,9 @@ public class ProductModel {
 
     @PreRemove
     public void preRemove() {
+        if(productsSold == null || productsSold.isEmpty())
+            return;
+
         for (ProductSoldModel productSoldModel : productsSold) {
             productSoldModel.setProductModel(null);
         }

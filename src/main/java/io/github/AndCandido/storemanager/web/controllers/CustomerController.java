@@ -1,6 +1,7 @@
 package io.github.AndCandido.storemanager.web.controllers;
 
 import io.github.AndCandido.storemanager.domain.dtos.CustomerDto;
+import io.github.AndCandido.storemanager.domain.mappers.CustomerMapper;
 import io.github.AndCandido.storemanager.domain.models.CustomerModel;
 import io.github.AndCandido.storemanager.domain.services.ICustomerService;
 import jakarta.validation.*;
@@ -9,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -20,33 +22,43 @@ public class CustomerController {
     private ICustomerService customerService;
 
     @PostMapping
-    public ResponseEntity<CustomerModel> saveCustomer(@RequestBody @Valid CustomerDto customerDto) {
+    public ResponseEntity<CustomerDto> saveCustomer(@RequestBody @Valid CustomerDto customerDto) {
         CustomerModel customer = customerService.saveCustomer(customerDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(customer);
+        var customerResDto = CustomerMapper.toDto(customer);
+        return ResponseEntity.status(HttpStatus.CREATED).body(customerResDto);
     }
 
     @GetMapping
-    public ResponseEntity<List<CustomerModel>> getAllCustomers() {
+    public ResponseEntity<List<CustomerDto>> getAllCustomers() {
         List<CustomerModel> customers = customerService.getAllCustomers();
 
-        return ResponseEntity.status(HttpStatus.OK).body(customers);
+        if(customers.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.OK).body(new ArrayList<CustomerDto>());
+        }
+
+        List<CustomerDto> customerResDtos = customers.stream()
+                .map(CustomerMapper::toDto).toList();
+
+        return ResponseEntity.status(HttpStatus.OK).body(customerResDtos);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CustomerModel> getCustomerById(
+    public ResponseEntity<CustomerDto> getCustomerById(
             @PathVariable UUID id
     ) {
        CustomerModel customer = customerService.getCustomerById(id);
-       return ResponseEntity.ok(customer);
+       var customerResDto = CustomerMapper.toDto(customer);
+       return ResponseEntity.ok(customerResDto);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CustomerModel> updateCustomer(
+    public ResponseEntity<CustomerDto> updateCustomer(
             @RequestBody @Valid CustomerDto customerDto,
             @PathVariable UUID id
     ) {
         CustomerModel customer = customerService.updateCustomer(customerDto, id);
-        return ResponseEntity.status(HttpStatus.CREATED).body(customer);
+        var customerResDto = CustomerMapper.toDto(customer);
+        return ResponseEntity.status(HttpStatus.CREATED).body(customerResDto);
     }
 
     @DeleteMapping("/{id}")

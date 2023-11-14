@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Entity(name = "TB_CUSTOMERS")
@@ -34,6 +35,19 @@ public class CustomerModel {
 
     private String phone;
 
+    @OneToMany(mappedBy = "customer")
+    private List<SaleModel> saleModels;
+
     @CreationTimestamp
     private LocalDateTime createdAt;
+
+    @PreRemove
+    public void preRemove() {
+        if(saleModels == null || saleModels.isEmpty())
+            return;
+
+        for (SaleModel saleModel : saleModels) {
+            saleModel.setCustomer(null);
+        }
+    }
 }
