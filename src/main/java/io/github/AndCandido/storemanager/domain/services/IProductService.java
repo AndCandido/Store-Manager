@@ -1,20 +1,25 @@
 package io.github.AndCandido.storemanager.domain.services;
 
 import io.github.AndCandido.storemanager.domain.dtos.ProductDto;
-import io.github.AndCandido.storemanager.domain.models.ProductModel;
+import io.github.AndCandido.storemanager.domain.models.Product;
+import io.github.AndCandido.storemanager.domain.models.ProductSold;
 
 import java.util.List;
 
 public interface IProductService {
-    ProductModel saveProduct(ProductDto productDto);
+    Product saveProduct(ProductDto productDto);
 
-    List<ProductModel> getAllProducts();
+    List<Product> getAllProducts();
 
-    ProductModel getProductById(Long id);
+    Product getProductById(Long id);
 
-    ProductModel updateProduct(ProductDto productDto, Long id);
+    Product updateProduct(ProductDto productDto, Long id);
 
-    ProductModel updateProduct(ProductModel productModel);
+    void returnStockQuantityByProductSold(ProductSold productSold);
+
+    Product updateProduct(Product product);
+
+    void updatedStockQuantityByProductSold(Product product, int quantitySold);
 
     void deleteProduct(Long id);
 }

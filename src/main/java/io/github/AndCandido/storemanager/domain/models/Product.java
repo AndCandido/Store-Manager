@@ -16,7 +16,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductModel {
+public class Product {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,8 +25,8 @@ public class ProductModel {
     @Column(nullable = false, length = 50)
     private String name;
 
-    @OneToMany(mappedBy = "productModel")
-    private List<ProductSoldModel> productsSold;
+    @OneToMany(mappedBy = "product")
+    private List<ProductSold> productsSold;
 
     @Column(nullable = false)
     private BigDecimal price;
@@ -42,8 +42,8 @@ public class ProductModel {
         if(productsSold == null || productsSold.isEmpty())
             return;
 
-        for (ProductSoldModel productSoldModel : productsSold) {
-            productSoldModel.setProductModel(null);
+        for (ProductSold productSold : productsSold) {
+            productSold.setProduct(null);
         }
     }
 }

@@ -1,7 +1,7 @@
 package io.github.AndCandido.storemanager.services.IntegrationTests;
 
 import io.github.AndCandido.storemanager.domain.dtos.ProductDto;
-import io.github.AndCandido.storemanager.domain.models.ProductModel;
+import io.github.AndCandido.storemanager.domain.models.Product;
 import io.github.AndCandido.storemanager.domain.repositories.IProductRepository;
 import io.github.AndCandido.storemanager.services.utils.ProductCreator;
 import org.junit.jupiter.api.Assertions;
@@ -38,7 +38,7 @@ public class ProductIT {
         };
 
         for (ProductDto product : products) {
-            var response = restTemplate.postForEntity(URI, product, ProductModel.class);
+            var response = restTemplate.postForEntity(URI, product, Product.class);
             var body = response.getBody();
 
             Assertions.assertEquals(HttpStatus.CREATED, response.getStatusCode());
@@ -56,7 +56,7 @@ public class ProductIT {
 
     @Test
     public void getAllProducts_Success() {
-        ProductModel[] productsSaved = {
+        Product[] productsSaved = {
             ProductCreator.createModel("Meia", 18.99, 5),
             ProductCreator.createModel("Meia", 18.99, 5)
         };
@@ -67,7 +67,7 @@ public class ProductIT {
                 URI,
                 HttpMethod.GET,
                 null,
-                new ParameterizedTypeReference<List<ProductModel>>() {}
+                new ParameterizedTypeReference<List<Product>>() {}
         );
 
         var body = response.getBody();
@@ -98,7 +98,7 @@ public class ProductIT {
                 URI,
                 HttpMethod.GET,
                 null,
-                new ParameterizedTypeReference<List<ProductModel>>() {}
+                new ParameterizedTypeReference<List<Product>>() {}
         );
 
         var body = response.getBody();
@@ -124,7 +124,7 @@ public class ProductIT {
                 getUriWithId(productSavedId),
                 HttpMethod.PUT,
                 new HttpEntity<ProductDto>(productForUpdate),
-                ProductModel.class
+                Product.class
         );
 
         var body = response.getBody();

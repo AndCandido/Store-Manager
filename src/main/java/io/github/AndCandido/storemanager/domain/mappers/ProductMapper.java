@@ -1,29 +1,23 @@
 package io.github.AndCandido.storemanager.domain.mappers;
 
 import io.github.AndCandido.storemanager.domain.dtos.ProductDto;
-import io.github.AndCandido.storemanager.domain.models.ProductModel;
+import io.github.AndCandido.storemanager.domain.models.Product;
 import org.springframework.beans.BeanUtils;
 
 public class ProductMapper {
 
-    public static ProductModel toModel(ProductDto productDto) {
-        var productModel = new ProductModel();
-        BeanUtils.copyProperties(productDto, productModel);
-        return productModel;
-    }
+    public static ProductDto toDto(Product product) {
+        if(product == null) return null;
 
-    public static ProductDto toDto(ProductModel productModel) {
-        var productSoldModels = productModel.getProductsSold();
-        var productSoldDtos = productSoldModels == null || productSoldModels.isEmpty() ? null
-            : ProductSoldMapper.toDtoList(productModel.getProductsSold());
+        var productsSoldDto = ProductSoldMapper.toDtoList(product.getProductsSold());
 
         return new ProductDto(
-                productModel.getId(),
-                productModel.getName(),
-                productSoldDtos,
-                productModel.getPrice(),
-                productModel.getStockQuantity(),
-                productModel.getCreatedAt()
+                product.getId(),
+                product.getName(),
+                productsSoldDto,
+                product.getPrice(),
+                product.getStockQuantity(),
+                product.getCreatedAt()
         );
     }
 

@@ -1,6 +1,7 @@
 package io.github.AndCandido.storemanager.domain.dtos;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -20,6 +21,7 @@ public record ProductDto(
         String name,
 
         @JsonInclude(JsonInclude.Include.NON_NULL)
+        @Valid
         List<ProductSoldDto> productsSold,
 
         @NotNull(message = "{product.field.price.null}")

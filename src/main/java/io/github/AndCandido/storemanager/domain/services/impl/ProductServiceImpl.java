@@ -1,14 +1,14 @@
 package io.github.AndCandido.storemanager.domain.services.impl;
 
+import io.github.AndCandido.storemanager.api.exceptions.InsufficientStockException;
+import io.github.AndCandido.storemanager.domain.models.ProductSold;
 import io.github.AndCandido.storemanager.domain.services.IProductService;
 import io.github.AndCandido.storemanager.domain.dtos.ProductDto;
 import io.github.AndCandido.storemanager.api.exceptions.ResourceNotFoundException;
-import io.github.AndCandido.storemanager.domain.models.ProductModel;
+import io.github.AndCandido.storemanager.domain.models.Product;
 import io.github.AndCandido.storemanager.domain.repositories.IProductRepository;
-import io.github.AndCandido.storemanager.domain.services.IProductSoldService;
 import io.github.AndCandido.storemanager.utils.ApplicationUtil;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,29 +16,28 @@ import java.util.List;
 @Service
 public class ProductServiceImpl implements IProductService {
 
-    @Autowired
     private IProductRepository productRepository;
 
-    @Autowired
-    private IProductSoldService productSoldService;
-
-    @Override
-    public ProductModel saveProduct(ProductDto productDto) {
-        ProductModel productModel = new ProductModel();
-        BeanUtils.copyProperties(productDto, productModel);
-
-        ProductModel productSaved = productRepository.save(productModel);
-        return productModel;
+    public ProductServiceImpl(IProductRepository productRepository) {
+        this.productRepository = productRepository;
     }
 
     @Override
-    public List<ProductModel> getAllProducts() {
+    public Product saveProduct(ProductDto productDto) {
+        Product product = new Product();
+        BeanUtils.copyProperties(productDto, product);
+
+        return productRepository.save(product);
+    }
+
+    @Override
+    public List<Product> getAllProducts() {
         return productRepository.findAll();
     }
 
     @Override
-    public ProductModel updateProduct(ProductDto productDto, Long id) {
-        ProductModel productFound = getProductById(id);
+    public Product updateProduct(ProductDto productDto, Long id) {
+        Product productFound = getProductById(id);
 
         ApplicationUtil.copyNonNullProperties(productDto, productFound);
 
@@ -46,29 +45,53 @@ public class ProductServiceImpl implements IProductService {
     }
 
     @Override
-    public ProductModel updateProduct(ProductModel productModel) {
-        return productRepository.save(productModel);
+    public void updatedStockQuantityByProductSold(Product product, int quantitySold) {
+        if (product.getStockQuantity() - quantitySold < 0) {
+            throwInsufficientStock(product.getName(), product.getStockQuantity());
+        }
+
+        decrementStockQuantityProduct(product, quantitySold);
+        updateProduct(product);
+    }
+
+    @Override
+    public void returnStockQuantityByProductSold(ProductSold productSold) {
+        if(productSold.getProduct() == null)
+            return;
+
+        var product = productSold.getProduct();
+        var stockQuantity = product.getStockQuantity();
+        var quantitySold = productSold.getQuantity();
+        product.setStockQuantity(stockQuantity + quantitySold);
+        updateProduct(product);
+    }
+
+    @Override
+    public Product updateProduct(Product product) {
+        return productRepository.save(product);
     }
 
     @Override
     public void deleteProduct(Long id) {
-        ProductModel product = getProductById(id);
-        var productsSoldModel = productSoldService
-                .getProductSoldByProduct(product).stream()
-                .map(productSoldModel -> {
-                    productSoldModel.setProductModel(null);
-                    return null;
-                })
-                .toList();
+        Product product = getProductById(id);
         productRepository.delete(product);
     }
 
     @Override
-    public ProductModel getProductById(Long id) {
-        ProductModel product = productRepository
+    public Product getProductById(Long id) {
+        return productRepository
                 .findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Produto não encontrado"));
+    }
 
-        return product;
+    private void throwInsufficientStock(String productName, Integer stockQuantity) {
+        throw new InsufficientStockException(
+                "Estoque insuficiente de " + productName + " para realizar esta compra, há " + stockQuantity + " unidade(s)"
+        );
+    }
+
+    private void decrementStockQuantityProduct(Product product, Integer quantitySold) {
+        var stockQuantity = product.getStockQuantity();
+        product.setStockQuantity(stockQuantity - quantitySold);
     }
 }

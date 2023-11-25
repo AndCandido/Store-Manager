@@ -13,17 +13,17 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductSoldModel {
+public class ProductSold {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
     @ManyToOne
-    private ProductModel productModel;
+    private Product product;
 
     @ManyToOne
     @JoinColumn(name = "sale_id")
-    private SaleModel sale;
+    private Sale sale;
 
     @Column(nullable = false)
     private Integer quantity;

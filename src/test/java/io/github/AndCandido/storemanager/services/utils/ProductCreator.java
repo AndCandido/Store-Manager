@@ -1,10 +1,9 @@
 package io.github.AndCandido.storemanager.services.utils;
 
 import io.github.AndCandido.storemanager.domain.dtos.ProductDto;
-import io.github.AndCandido.storemanager.domain.models.ProductModel;
+import io.github.AndCandido.storemanager.domain.models.Product;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 public class ProductCreator {
     public static ProductDto createDto(String name, double price, int stockQuantity) {
@@ -15,8 +14,8 @@ public class ProductCreator {
                 .build();
     }
 
-    public static ProductModel createModel(String name, double price, int stockQuantity) {
-        return ProductModel.builder()
+    public static Product createModel(String name, double price, int stockQuantity) {
+        return Product.builder()
                 .name(name)
                 .price(BigDecimal.valueOf(price).setScale(2))
                 .stockQuantity(stockQuantity)

@@ -1,35 +1,33 @@
 package io.github.AndCandido.storemanager.services.utils;
 
+import io.github.AndCandido.storemanager.domain.dtos.CustomerDto;
+import io.github.AndCandido.storemanager.domain.dtos.InstallmentDto;
 import io.github.AndCandido.storemanager.domain.dtos.ProductSoldDto;
 import io.github.AndCandido.storemanager.domain.dtos.SaleDto;
-import io.github.AndCandido.storemanager.domain.enums.PaymentMethod;
 import io.github.AndCandido.storemanager.domain.mappers.CustomerMapper;
-import io.github.AndCandido.storemanager.domain.models.CustomerModel;
-import io.github.AndCandido.storemanager.domain.models.ProductSoldModel;
-import io.github.AndCandido.storemanager.domain.models.SaleModel;
+import io.github.AndCandido.storemanager.domain.models.Customer;
+import io.github.AndCandido.storemanager.domain.models.ProductSold;
+import io.github.AndCandido.storemanager.domain.models.Sale;
 
 import java.math.BigDecimal;
 import java.util.List;
 
 public class SaleCreator {
 
-    public static SaleModel createModel(short duplication, String paymentMethod, CustomerModel customer, double price, List<ProductSoldModel> productSoldModels) {
-        return SaleModel.builder()
-                .duplication(duplication)
-                .paymentMethod(PaymentMethod.valueOf(paymentMethod))
+    public static Sale createModel(Customer customer, double price, List<ProductSold> productsSold) {
+        return Sale.builder()
                 .customer(customer)
                 .price(BigDecimal.valueOf(price))
-                .productsSold(productSoldModels)
+                .productsSold(productsSold)
                 .build();
     }
 
-    public static SaleDto createDto(short duplication, String paymentMethod, CustomerModel customer, double price, List<ProductSoldDto> productSoldDtos) {
+    public static SaleDto createDto(CustomerDto customer, double price, List<ProductSoldDto> productsSold, List<InstallmentDto> installmentsDto) {
         return SaleDto.builder()
-                .duplication(duplication)
-                .paymentMethod(PaymentMethod.valueOf(paymentMethod))
-                .customer(CustomerMapper.toDto(customer))
+                .customer(customer)
                 .price(BigDecimal.valueOf(price))
-                .productsSold(productSoldDtos)
+                .productsSold(productsSold)
+                .installments(installmentsDto)
                 .build();
     }
 }

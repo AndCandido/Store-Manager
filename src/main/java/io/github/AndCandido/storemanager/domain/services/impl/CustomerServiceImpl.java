@@ -3,7 +3,7 @@ package io.github.AndCandido.storemanager.domain.services.impl;
 import io.github.AndCandido.storemanager.domain.dtos.CustomerDto;
 import io.github.AndCandido.storemanager.domain.services.ICustomerService;
 import io.github.AndCandido.storemanager.api.exceptions.ResourceNotFoundException;
-import io.github.AndCandido.storemanager.domain.models.CustomerModel;
+import io.github.AndCandido.storemanager.domain.models.Customer;
 import io.github.AndCandido.storemanager.domain.repositories.ICustomerRepository;
 import io.github.AndCandido.storemanager.utils.ApplicationUtil;
 import org.springframework.beans.BeanUtils;
@@ -20,8 +20,8 @@ public class CustomerServiceImpl implements ICustomerService {
     private ICustomerRepository customerRepository;
 
     @Override
-    public CustomerModel saveCustomer(CustomerDto customerDto) {
-        var customer = new CustomerModel();
+    public Customer saveCustomer(CustomerDto customerDto) {
+        var customer = new Customer();
 
         BeanUtils.copyProperties(customerDto, customer);
 
@@ -29,13 +29,13 @@ public class CustomerServiceImpl implements ICustomerService {
     }
 
     @Override
-    public List<CustomerModel> getAllCustomers() {
+    public List<Customer> getAllCustomers() {
         return customerRepository.findAll();
     }
 
     @Override
-    public CustomerModel updateCustomer(CustomerDto customerDto, UUID id) {
-        CustomerModel customer = getCustomerById(id);
+    public Customer updateCustomer(CustomerDto customerDto, UUID id) {
+        Customer customer = getCustomerById(id);
 
         ApplicationUtil.copyNonNullProperties(customerDto, customer);
 
@@ -44,13 +44,13 @@ public class CustomerServiceImpl implements ICustomerService {
 
     @Override
     public void deleteCustomer(UUID id) {
-        CustomerModel customer = getCustomerById(id);
+        Customer customer = getCustomerById(id);
         customerRepository.delete(customer);
     }
 
     @Override
-    public CustomerModel getCustomerById(UUID id) {
-        CustomerModel customer = customerRepository
+    public Customer getCustomerById(UUID id) {
+        Customer customer = customerRepository
                 .findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Cliente não encontrado"));
 

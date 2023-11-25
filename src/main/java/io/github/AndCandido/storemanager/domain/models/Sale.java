@@ -17,23 +17,20 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SaleModel  {
+public class Sale {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
-    @Column(nullable = false)
-    private short duplication;
-
-    @Column(nullable = false)
-    private PaymentMethod paymentMethod;
-
     @ManyToOne
-    private CustomerModel customer;
+    private Customer customer;
 
     @OneToMany(mappedBy = "sale", cascade = CascadeType.ALL)
-    private List<ProductSoldModel> productsSold = new ArrayList<>();
+    private List<ProductSold> productsSold = new ArrayList<>();
+
+    @OneToMany(mappedBy = "sale", cascade = CascadeType.ALL)
+    private List<Installment> installments;
 
     @Column(nullable = false)
     private BigDecimal price;

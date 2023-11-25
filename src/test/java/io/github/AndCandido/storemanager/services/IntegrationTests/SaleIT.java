@@ -1,18 +1,17 @@
 package io.github.AndCandido.storemanager.services.IntegrationTests;
 
+import io.github.AndCandido.storemanager.domain.dtos.InstallmentDto;
 import io.github.AndCandido.storemanager.domain.dtos.ProductSoldDto;
 import io.github.AndCandido.storemanager.domain.dtos.SaleDto;
+import io.github.AndCandido.storemanager.domain.mappers.CustomerMapper;
 import io.github.AndCandido.storemanager.domain.mappers.SaleMapper;
-import io.github.AndCandido.storemanager.domain.models.CustomerModel;
-import io.github.AndCandido.storemanager.domain.models.ProductModel;
-import io.github.AndCandido.storemanager.domain.models.SaleModel;
+import io.github.AndCandido.storemanager.domain.models.Customer;
+import io.github.AndCandido.storemanager.domain.models.Product;
+import io.github.AndCandido.storemanager.domain.models.Sale;
 import io.github.AndCandido.storemanager.domain.repositories.ICustomerRepository;
 import io.github.AndCandido.storemanager.domain.repositories.IProductRepository;
 import io.github.AndCandido.storemanager.domain.repositories.ISaleRepository;
-import io.github.AndCandido.storemanager.services.utils.CustomerCreator;
-import io.github.AndCandido.storemanager.services.utils.ProductCreator;
-import io.github.AndCandido.storemanager.services.utils.ProductSoldCreator;
-import io.github.AndCandido.storemanager.services.utils.SaleCreator;
+import io.github.AndCandido.storemanager.services.utils.*;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -43,10 +42,11 @@ public class SaleIT {
     @Autowired
     private ICustomerRepository customerRepository;
 
-    private List<ProductModel> productsOriginal;
+    private List<Product> productsOriginal;
     private List<ProductSoldDto> productsSoldDtoOriginal;
-    private CustomerModel customerOriginal;
-    private SaleModel saleSaved;
+    private List<InstallmentDto> installmentsDto;
+    private Customer customerOriginal;
+    private Sale saleSaved;
     private SaleDto saleDto;
 
     @BeforeEach
@@ -65,6 +65,10 @@ public class SaleIT {
                 createProductSoldDto(productsOriginal.get(1), 1),
                 createProductSoldDto(productsOriginal.get(2), 5),
                 createProductSoldDto(productsOriginal.get(3), 8)
+        );
+
+        installmentsDto = List.of(
+                createInstallment("2023-12-12", 120.90, "pix", true)
         );
 
         customerOriginal = customerRepository.save(createCustomer());
@@ -156,7 +160,7 @@ public class SaleIT {
         var productsUpdated = productRepository.findAll();
         var productsSoldUpdated = body.productsSold();
 
-        for (ProductModel product : productsOriginal) {
+        for (Product product : productsOriginal) {
             var productOriginal = getProductOriginalOn(product);
             var productUpdated = getProductUpdatedOn(product, productsUpdated);
             var productSoldOriginal = getProductSoldOriginal(product);
@@ -205,22 +209,22 @@ public class SaleIT {
         }
     }
 
-    private ProductModel getProductUpdatedById(Long id) {
+    private Product getProductUpdatedById(Long id) {
         return productRepository.findById(id).orElse(null);
     }
 
-    private ProductModel getProductById(Long id) {
-        for (ProductModel productModel : productsOriginal) {
-            if(Objects.equals(productModel.getId(), id))
-                return productModel;
+    private Product getProductById(Long id) {
+        for (Product product : productsOriginal) {
+            if(Objects.equals(product.getId(), id))
+                return product;
         }
 
         return null;
     }
 
     private void assertionsPresentOnOriginal(
-            ProductModel productOriginal,
-            ProductModel productUpdated
+            Product productOriginal,
+            Product productUpdated
     ) {
         Assertions.assertEquals(
                 productOriginal.getStockQuantity(),
@@ -229,8 +233,8 @@ public class SaleIT {
     }
 
     private void assertionsVerifyProductOriginalAndUpdated(
-            ProductModel productOriginal,
-            ProductModel productUpdated,
+            Product productOriginal,
+            Product productUpdated,
             ProductSoldDto productSoldDtoUpdated
 
     ) {
@@ -249,50 +253,56 @@ public class SaleIT {
 
     private void assertionsBodySale(SaleDto body) {
         var productsUpdated = productRepository.findAll();
-        var productsOnSold = new ArrayList<ProductModel>();
+        var productsOnSold = new ArrayList<Product>();
 
-        for (ProductModel product : productsOriginal) {
+        for (Product product : productsOriginal) {
 
 
         }
     }
 
-    private SaleModel saveSaleDto() {
+    private Sale saveSaleDto() {
         return saleRepository.save(SaleMapper.toModel(saleDto));
     }
 
-    private ProductModel createProduct(String name, double price, int stockQuantity) {
+    private Product createProduct(String name, double price, int stockQuantity) {
         return ProductCreator.createModel(name, price, stockQuantity);
     }
 
-    private ProductSoldDto createProductSoldDto(ProductModel productModel, int quantity) {
-        return ProductSoldCreator.createDto(productModel.getId(), quantity);
+    private ProductSoldDto createProductSoldDto(Product product, int quantity) {
+        return ProductSoldCreator.createDto(product.getId(), quantity);
     }
 
-    private CustomerModel createCustomer() {
+    private Customer createCustomer() {
         return CustomerCreator.createModel(
                 "Carlos Henrique Lima", "440.052.520-10", "Irmão do Dr.", "Rua. Bairro.", null
         );
     }
 
+    private InstallmentDto createInstallment(String dueDate, double price, String paymentMethod, boolean isPaid) {
+        return InstallmentCreator.createDto(
+                dueDate, price, paymentMethod, isPaid
+        );
+    }
+
     private SaleDto createSaleDto() {
-        return SaleCreator.createDto((short) 1, "PIX", customerOriginal, 123.00, productsSoldDtoOriginal);
+        return SaleCreator.createDto(CustomerMapper.toDto(customerOriginal), 123.00, productsSoldDtoOriginal, installmentsDto);
     }
 
     private SaleDto createSaleDtoForUpdate(List<ProductSoldDto> productsSoldDtoForUpdate) {
-        return SaleCreator.createDto((short) 5, "DEBIT_CARD", customerOriginal, 1000.00, productsSoldDtoForUpdate);
+        return SaleCreator.createDto(CustomerMapper.toDto(customerOriginal), 1000.00, productsSoldDtoForUpdate, installmentsDto);
     }
 
-    private ProductModel getProductOriginalOn(ProductModel productModel) {
-        return getProductOn(productModel, productsOriginal);
+    private Product getProductOriginalOn(Product product) {
+        return getProductOn(product, productsOriginal);
     }
 
-    private ProductModel getProductUpdatedOn(ProductModel productModel, List<ProductModel> productsUpdated) {
-        return getProductOn(productModel, productsUpdated);
+    private Product getProductUpdatedOn(Product product, List<Product> productsUpdated) {
+        return getProductOn(product, productsUpdated);
     }
 
-    private ProductModel getProductOn(ProductModel productModel, List<ProductModel> productsForIterate) {
-        for (ProductModel product : productsForIterate) {
+    private Product getProductOn(Product productModel, List<Product> productsForIterate) {
+        for (Product product : productsForIterate) {
             if(Objects.equals(product.getId(), productModel.getId()))
                 return product;
         }
@@ -300,17 +310,17 @@ public class SaleIT {
         return null;
     }
 
-    private ProductSoldDto getProductSoldOriginal(ProductModel productModel) {
-        return getProductSoldOn(productModel, productsSoldDtoOriginal);
+    private ProductSoldDto getProductSoldOriginal(Product product) {
+        return getProductSoldOn(product, productsSoldDtoOriginal);
     }
 
-    private ProductSoldDto getProductSoldUpdated(ProductModel productModel, List<ProductSoldDto> productsSoldDtoUpdated) {
-        return getProductSoldOn(productModel, productsSoldDtoUpdated);
+    private ProductSoldDto getProductSoldUpdated(Product product, List<ProductSoldDto> productsSoldDtoUpdated) {
+        return getProductSoldOn(product, productsSoldDtoUpdated);
     }
 
-    private ProductSoldDto getProductSoldOn(ProductModel productModel, List<ProductSoldDto> productsSoldDtoForIterate) {
+    private ProductSoldDto getProductSoldOn(Product product, List<ProductSoldDto> productsSoldDtoForIterate) {
         for (ProductSoldDto productSoldDto : productsSoldDtoForIterate){
-            if(Objects.equals(productSoldDto.productId(), productModel.getId())) {
+            if(Objects.equals(productSoldDto.productId(), product.getId())) {
                 return productSoldDto;
             }
         }

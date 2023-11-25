@@ -3,7 +3,7 @@ package io.github.AndCandido.storemanager.web.controllers;
 
 import io.github.AndCandido.storemanager.domain.dtos.ProductDto;
 import io.github.AndCandido.storemanager.domain.mappers.ProductMapper;
-import io.github.AndCandido.storemanager.domain.models.ProductModel;
+import io.github.AndCandido.storemanager.domain.models.Product;
 import io.github.AndCandido.storemanager.domain.services.IProductService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,14 +23,14 @@ public class ProductController {
 
     @PostMapping
     public ResponseEntity<ProductDto> saveProduct(@RequestBody @Valid ProductDto productDto) {
-        ProductModel productSaved = productService.saveProduct(productDto);
+        Product productSaved = productService.saveProduct(productDto);
         var productResponse = ProductMapper.toDto(productSaved);
         return ResponseEntity.status(HttpStatus.CREATED).body(productResponse);
     }
 
     @GetMapping
     public ResponseEntity<List<ProductDto>> getAllProducts() {
-        List<ProductModel> products = productService.getAllProducts();
+        List<Product> products = productService.getAllProducts();
 
         if(products.isEmpty()) {
             return ResponseEntity.status(HttpStatus.OK).body(new ArrayList<ProductDto>());
@@ -44,7 +44,7 @@ public class ProductController {
 
     @GetMapping("/{id}")
     public ResponseEntity<ProductDto> getProductById(@PathVariable Long id) {
-        ProductModel product = productService.getProductById(id);
+        Product product = productService.getProductById(id);
         var productResponse = ProductMapper.toDto(product);
         return ResponseEntity.ok(productResponse);
     }
@@ -53,7 +53,7 @@ public class ProductController {
     public ResponseEntity<ProductDto> updateProduct(
             @RequestBody @Valid ProductDto productDto, @PathVariable Long id
     ) {
-        ProductModel product = productService.updateProduct(productDto, id);
+        Product product = productService.updateProduct(productDto, id);
         var productResponse = ProductMapper.toDto(product);
         return ResponseEntity.status(HttpStatus.CREATED).body(productResponse);
     }

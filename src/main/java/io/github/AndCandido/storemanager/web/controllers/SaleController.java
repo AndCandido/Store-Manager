@@ -2,7 +2,7 @@ package io.github.AndCandido.storemanager.web.controllers;
 
 import io.github.AndCandido.storemanager.domain.dtos.SaleDto;
 import io.github.AndCandido.storemanager.domain.mappers.SaleMapper;
-import io.github.AndCandido.storemanager.domain.models.SaleModel;
+import io.github.AndCandido.storemanager.domain.models.Sale;
 import io.github.AndCandido.storemanager.domain.services.ISaleService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -25,14 +25,14 @@ public class SaleController {
 
     @PostMapping
     public ResponseEntity<SaleDto> saveSale(@RequestBody @Valid SaleDto saleDto) {
-        SaleModel sale = saleService.saveSale(saleDto);
+        Sale sale = saleService.saveSale(saleDto);
         var saleResDto = SaleMapper.toDto(sale);
         return ResponseEntity.status(HttpStatus.CREATED).body(saleResDto);
     }
 
     @GetMapping
     public ResponseEntity<List<SaleDto>> getAllSales() {
-        List<SaleModel> sales = saleService.getAllSales();
+        List<Sale> sales = saleService.getAllSales();
 
         if(sales.isEmpty()) {
             return ResponseEntity.status(HttpStatus.OK).body(new ArrayList<SaleDto>());
@@ -46,7 +46,7 @@ public class SaleController {
 
     @GetMapping("/{id}")
     public ResponseEntity<SaleDto> getSaleById(@PathVariable UUID id) {
-        SaleModel sale = saleService.getSaleById(id);
+        Sale sale = saleService.getSaleById(id);
         var saleResDto = SaleMapper.toDto(sale);
         return ResponseEntity.ok(saleResDto);
     }
@@ -56,7 +56,7 @@ public class SaleController {
             @RequestBody @Valid SaleDto saleDto,
             @PathVariable UUID id
     ) {
-        SaleModel sale = saleService.updateSale(saleDto, id);
+        Sale sale = saleService.updateSale(saleDto, id);
         var saleResDto = SaleMapper.toDto(sale);
         return ResponseEntity.status(HttpStatus.CREATED).body(saleResDto);
     }

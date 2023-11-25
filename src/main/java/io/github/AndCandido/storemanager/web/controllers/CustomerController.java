@@ -2,7 +2,7 @@ package io.github.AndCandido.storemanager.web.controllers;
 
 import io.github.AndCandido.storemanager.domain.dtos.CustomerDto;
 import io.github.AndCandido.storemanager.domain.mappers.CustomerMapper;
-import io.github.AndCandido.storemanager.domain.models.CustomerModel;
+import io.github.AndCandido.storemanager.domain.models.Customer;
 import io.github.AndCandido.storemanager.domain.services.ICustomerService;
 import jakarta.validation.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,14 +23,14 @@ public class CustomerController {
 
     @PostMapping
     public ResponseEntity<CustomerDto> saveCustomer(@RequestBody @Valid CustomerDto customerDto) {
-        CustomerModel customer = customerService.saveCustomer(customerDto);
+        Customer customer = customerService.saveCustomer(customerDto);
         var customerResDto = CustomerMapper.toDto(customer);
         return ResponseEntity.status(HttpStatus.CREATED).body(customerResDto);
     }
 
     @GetMapping
     public ResponseEntity<List<CustomerDto>> getAllCustomers() {
-        List<CustomerModel> customers = customerService.getAllCustomers();
+        List<Customer> customers = customerService.getAllCustomers();
 
         if(customers.isEmpty()) {
             return ResponseEntity.status(HttpStatus.OK).body(new ArrayList<CustomerDto>());
@@ -46,7 +46,7 @@ public class CustomerController {
     public ResponseEntity<CustomerDto> getCustomerById(
             @PathVariable UUID id
     ) {
-       CustomerModel customer = customerService.getCustomerById(id);
+       Customer customer = customerService.getCustomerById(id);
        var customerResDto = CustomerMapper.toDto(customer);
        return ResponseEntity.ok(customerResDto);
     }
@@ -56,7 +56,7 @@ public class CustomerController {
             @RequestBody @Valid CustomerDto customerDto,
             @PathVariable UUID id
     ) {
-        CustomerModel customer = customerService.updateCustomer(customerDto, id);
+        Customer customer = customerService.updateCustomer(customerDto, id);
         var customerResDto = CustomerMapper.toDto(customer);
         return ResponseEntity.status(HttpStatus.CREATED).body(customerResDto);
     }

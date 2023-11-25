@@ -16,7 +16,7 @@ import java.util.UUID;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class CustomerModel {
+public class Customer {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -36,18 +36,25 @@ public class CustomerModel {
     private String phone;
 
     @OneToMany(mappedBy = "customer")
-    private List<SaleModel> saleModels;
+    private List<Sale> sales;
+
+    @OneToMany(mappedBy = "customer")
+    private List<Installment> installments;
 
     @CreationTimestamp
     private LocalDateTime createdAt;
 
     @PreRemove
-    public void preRemove() {
-        if(saleModels == null || saleModels.isEmpty())
-            return;
-
-        for (SaleModel saleModel : saleModels) {
-            saleModel.setCustomer(null);
+    public void setCustomerNullOn() {
+        if(!isNullOrEmpty(sales)) {
+            sales.forEach(sale -> sale.setCustomer(null));
         }
+        if(!isNullOrEmpty(installments)) {
+            installments.forEach(installment -> installment.setCustomer(null));
+        }
+    }
+
+    private boolean isNullOrEmpty(List<?> items) {
+        return items == null || items.isEmpty();
     }
 }
