@@ -4,10 +4,8 @@ import io.github.AndCandido.storemanager.domain.dtos.InstallmentDto;
 import io.github.AndCandido.storemanager.domain.dtos.ProductSoldDto;
 import io.github.AndCandido.storemanager.domain.dtos.SaleDto;
 import io.github.AndCandido.storemanager.domain.mappers.CustomerMapper;
-import io.github.AndCandido.storemanager.domain.mappers.SaleMapper;
 import io.github.AndCandido.storemanager.domain.models.Customer;
 import io.github.AndCandido.storemanager.domain.models.Product;
-import io.github.AndCandido.storemanager.domain.models.Sale;
 import io.github.AndCandido.storemanager.domain.repositories.ICustomerRepository;
 import io.github.AndCandido.storemanager.domain.repositories.IProductRepository;
 import io.github.AndCandido.storemanager.domain.repositories.ISaleRepository;
@@ -22,13 +20,12 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureTestDatabase
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class SaleIT {
 
     private final String URI = "/sales";
@@ -42,41 +39,46 @@ public class SaleIT {
     @Autowired
     private ICustomerRepository customerRepository;
 
-    private List<Product> productsOriginal;
-    private List<ProductSoldDto> productsSoldDtoOriginal;
+    private List<Product> products;
+    private HashMap<Long, Product> productsMappedOriginal = new HashMap<>();
+    private HashMap<Long, Product> productsMappedUpdated = new HashMap<>();
+    private List<ProductSoldDto> productsSoldDto;
     private List<InstallmentDto> installmentsDto;
-    private Customer customerOriginal;
-    private Sale saleSaved;
+    private Customer customer;
+    private SaleDto saleSaved;
     private SaleDto saleDto;
 
     @BeforeEach
     void beforeEach() {
-        productsOriginal = List.of(
+        products = productRepository.saveAll(List.of(
                 createProduct("Meia Social", 19.99, 18),
                 createProduct("Calça social", 185.05, 4),
                 createProduct("Blusa Juvenil Tam P", 45.50, 10),
                 createProduct("Camisa Golo Polo", 90, 11),
-                createProduct("short Tec Teu", 18.0, 1)
-        );
-        productsOriginal = productRepository.saveAll(productsOriginal);
+                createProduct("Short curto", 18.0, 1)
+        ));
 
-        productsSoldDtoOriginal = List.of(
-                createProductSoldDto(productsOriginal.get(0), 18),
-                createProductSoldDto(productsOriginal.get(1), 1),
-                createProductSoldDto(productsOriginal.get(2), 5),
-                createProductSoldDto(productsOriginal.get(3), 8)
+        instanceProductsMapped(productsMappedOriginal, products);
+
+        productsSoldDto = List.of(
+                createProductSoldDto(products.get(0), 18),
+                createProductSoldDto(products.get(1), 1),
+                createProductSoldDto(products.get(2), 5),
+                createProductSoldDto(products.get(3), 8)
         );
 
         installmentsDto = List.of(
-                createInstallment("2023-12-12", 120.90, "pix", true)
+                createInstallment("2023-12-12", 120.90, "PIX", true)
         );
 
-        customerOriginal = customerRepository.save(createCustomer());
+        customer = customerRepository.save(createCustomer());
         saleDto = createSaleDto();
     }
 
     @AfterEach
     void cleanAll() {
+        productsMappedOriginal = new HashMap<>();
+        productsMappedUpdated = new HashMap<>();
         productRepository.deleteAll();
         customerRepository.deleteAll();
         saleRepository.deleteAll();
@@ -105,13 +107,12 @@ public class SaleIT {
                 new ParameterizedTypeReference<List<SaleDto>>() {}
         );
 
+        List<SaleDto> body = res.getBody();
+
         Assertions.assertEquals(HttpStatus.OK, res.getStatusCode());
-        var body = res.getBody();
-        Assertions.assertNotNull(body);
-        Assertions.assertFalse(body.isEmpty());
-        for (SaleDto saleResDto : body) {
-            Assertions.assertNotNull(saleResDto);
-        }
+
+        assertionsNotNullBodySaleList(body);
+        assertionsBodySaleList(body);
     }
 
     @Test
@@ -119,13 +120,15 @@ public class SaleIT {
         saleSaved = saveSaleDto();
 
         var res = restTemplate.getForEntity(
-                URI + "/" + saleSaved.getId(),
+                URI + "/" + saleSaved.id(),
                 SaleDto.class
         );
         var body = res.getBody();
 
         Assertions.assertEquals(HttpStatus.OK, res.getStatusCode());
-        Assertions.assertNotNull(body);
+
+        assertionsNotNullBodySale(body);
+        assertionsBodySale(body);
     }
 
     @Test
@@ -133,16 +136,16 @@ public class SaleIT {
         saleSaved = saveSaleDto();
 
         var productsSoldDtoForUpdate = List.of(
-                createProductSoldDto(productsOriginal.get(0), 18),
-                createProductSoldDto(productsOriginal.get(1), 3),
-                createProductSoldDto(productsOriginal.get(3), 8),
-                createProductSoldDto(productsOriginal.get(4), 1)
+                createProductSoldDto(products.get(0), 18),
+                createProductSoldDto(products.get(1), 3),
+                createProductSoldDto(products.get(3), 8),
+                createProductSoldDto(products.get(4), 1)
         );
 
         saleDto = createSaleDtoForUpdate(productsSoldDtoForUpdate);
 
         var res =  restTemplate.exchange(
-                URI + "/" + saleSaved.getId(),
+                URI + "/" + saleSaved.id(),
                 HttpMethod.PUT,
                 new HttpEntity<SaleDto>(saleDto),
                 SaleDto.class
@@ -153,15 +156,15 @@ public class SaleIT {
         Assertions.assertEquals(HttpStatus.CREATED, res.getStatusCode());
 
         assertionsNotNullBodySale(body);
-        Assertions.assertEquals(saleSaved.getId(), body.id());
-        Assertions.assertEquals(saleSaved.getCreatedAt(), body.createdAt());
+        Assertions.assertEquals(saleSaved.id(), body.id());
+        Assertions.assertEquals(saleSaved.createdAt(), body.createdAt());
         Assertions.assertEquals(productsSoldDtoForUpdate.size(), body.productsSold().size());
 
         var productsUpdated = productRepository.findAll();
         var productsSoldUpdated = body.productsSold();
 
-        for (Product product : productsOriginal) {
-            var productOriginal = getProductOriginalOn(product);
+        for (Product product : productsMappedOriginal.values()) {
+            var productOriginal = productsMappedOriginal.get(product.getId());
             var productUpdated = getProductUpdatedOn(product, productsUpdated);
             var productSoldOriginal = getProductSoldOriginal(product);
             var productSoldUpdated = getProductSoldUpdated(product, productsSoldUpdated);
@@ -189,18 +192,18 @@ public class SaleIT {
         saleSaved = saveSaleDto();
 
         var res = restTemplate.exchange(
-                URI + "/" + saleSaved.getId(),
+                URI + "/" + saleSaved.id(),
                 HttpMethod.DELETE,
                 null,
                 Void.class
         );
 
-        var saleDeleted = saleRepository.findById(saleSaved.getId()).orElse(null);
+        var saleDeleted = saleRepository.findById(saleSaved.id()).orElse(null);
         Assertions.assertNull(saleDeleted);
 
         Assertions.assertEquals(HttpStatus.NO_CONTENT, res.getStatusCode());
 
-        for (ProductSoldDto productSoldDto : productsSoldDtoOriginal) {
+        for (ProductSoldDto productSoldDto : productsSoldDto) {
             var productId = productSoldDto.productId();
             var productOriginal = getProductById(productId);
             var productUpdated = getProductUpdatedById(productId);
@@ -209,12 +212,18 @@ public class SaleIT {
         }
     }
 
+    private void instanceProductsMapped(HashMap<Long, Product> productsMapped, List<Product> products) {
+        for (Product product: products) {
+            productsMapped.put(product.getId(), product);
+        }
+    }
+
     private Product getProductUpdatedById(Long id) {
         return productRepository.findById(id).orElse(null);
     }
 
     private Product getProductById(Long id) {
-        for (Product product : productsOriginal) {
+        for (Product product : productsMappedOriginal.values()) {
             if(Objects.equals(product.getId(), id))
                 return product;
         }
@@ -247,22 +256,65 @@ public class SaleIT {
     private void assertionsNotNullBodySale(SaleDto body) {
         Assertions.assertNotNull(body);
         Assertions.assertNotNull(body.id());
-        Assertions.assertNotNull(body.createdAt());
+        Assertions.assertNotNull(body.price());
+        Assertions.assertNotNull(body.customer());
+        Assertions.assertNotNull(body.installments());
         Assertions.assertNotNull(body.productsSold());
+        Assertions.assertNotNull(body.createdAt());
     }
 
-    private void assertionsBodySale(SaleDto body) {
-        var productsUpdated = productRepository.findAll();
-        var productsOnSold = new ArrayList<Product>();
+    private void assertionsNotNullBodySaleList(List<SaleDto> body) {
+        Assertions.assertNotNull(body);
+        Assertions.assertFalse(body.isEmpty());
 
-        for (Product product : productsOriginal) {
-
-
+        for (SaleDto saleBody : body) {
+            assertionsNotNullBodySale(saleBody);
         }
     }
 
-    private Sale saveSaleDto() {
-        return saleRepository.save(SaleMapper.toModel(saleDto));
+    private void assertionsBodySale(SaleDto body) {
+        var products = productRepository.findAll();
+        instanceProductsMapped(productsMappedUpdated, products);
+
+        assertionsProductSold(body);
+        assertionsInstallments(body);
+    }
+
+    private void assertionsBodySaleList(List<SaleDto> body) {
+        for (SaleDto saleBody : body) {
+            assertionsBodySale(saleBody);
+        }
+    }
+
+    private void assertionsProductSold(SaleDto body) {
+        for (ProductSoldDto productSoldDto : body.productsSold()) {
+            var productId = productSoldDto.productId();
+            Assertions.assertNotNull(productId);
+
+            var productOriginal = productsMappedOriginal.get(productId);
+            var productUpdated = productsMappedUpdated.get(productId);
+
+            var stockQuantityOriginal = productOriginal.getStockQuantity();
+            var stockQuantityUpdated = productUpdated.getStockQuantity();
+
+            Assertions.assertEquals(
+                    stockQuantityOriginal - productSoldDto.quantity(),
+                    stockQuantityUpdated
+            );
+        }
+    }
+
+    private void assertionsInstallments(SaleDto body) {
+        for (InstallmentDto installment : body.installments()) {
+            Assertions.assertNotNull(installment);
+        }
+
+    }
+
+    private SaleDto saveSaleDto() {
+        var res = restTemplate.postForEntity(URI, saleDto, SaleDto.class);
+        assert res.getBody() != null;
+        return res.getBody();
     }
 
     private Product createProduct(String name, double price, int stockQuantity) {
@@ -286,15 +338,11 @@ public class SaleIT {
     }
 
     private SaleDto createSaleDto() {
-        return SaleCreator.createDto(CustomerMapper.toDto(customerOriginal), 123.00, productsSoldDtoOriginal, installmentsDto);
+        return SaleCreator.createDto(CustomerMapper.toDto(customer), 123.00, productsSoldDto, installmentsDto);
     }
 
     private SaleDto createSaleDtoForUpdate(List<ProductSoldDto> productsSoldDtoForUpdate) {
-        return SaleCreator.createDto(CustomerMapper.toDto(customerOriginal), 1000.00, productsSoldDtoForUpdate, installmentsDto);
-    }
-
-    private Product getProductOriginalOn(Product product) {
-        return getProductOn(product, productsOriginal);
+        return SaleCreator.createDto(CustomerMapper.toDto(customer), 1000.00, productsSoldDtoForUpdate, installmentsDto);
     }
 
     private Product getProductUpdatedOn(Product product, List<Product> productsUpdated) {
@@ -311,7 +359,7 @@ public class SaleIT {
     }
 
     private ProductSoldDto getProductSoldOriginal(Product product) {
-        return getProductSoldOn(product, productsSoldDtoOriginal);
+        return getProductSoldOn(product, productsSoldDto);
     }
 
     private ProductSoldDto getProductSoldUpdated(Product product, List<ProductSoldDto> productsSoldDtoUpdated) {
