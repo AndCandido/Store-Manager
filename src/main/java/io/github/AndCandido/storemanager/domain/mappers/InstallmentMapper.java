@@ -13,24 +13,22 @@ public class InstallmentMapper {
         return installment;
     }
 
-    public static InstallmentDto toResponseDto(Installment installment) {
+    public static InstallmentDto toDtoWithoutAssociations(Installment installment) {
         if(installment == null) return null;
 
-        return new InstallmentDto(
-                installment.getId(),
-                installment.getDueDate(),
-                installment.getPrice(),
-                installment.getPaymentMethod(),
-                installment.isPaid(),
-                null,
-                null,
-                installment.getCreatedAt()
-        );
+        return InstallmentDto.builder()
+                .id(installment.getId())
+                .dueDate(installment.getDueDate())
+                .price(installment.getPrice())
+                .paymentMethod(installment.getPaymentMethod())
+                .isPaid(installment.isPaid())
+                .createdAt(installment.getCreatedAt())
+                .build();
     }
 
-    public static List<InstallmentDto> toResponseDtoList(List<Installment> installments) {
+    public static List<InstallmentDto> toDtoListWithoutAssociations(List<Installment> installments) {
         if(installments == null || installments.isEmpty()) return null;
 
-        return installments.stream().map(InstallmentMapper::toResponseDto).toList();
+        return installments.stream().map(InstallmentMapper::toDtoWithoutAssociations).toList();
     }
 }

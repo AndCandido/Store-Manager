@@ -1,6 +1,5 @@
 package io.github.AndCandido.storemanager.domain.models;
 
-import io.github.AndCandido.storemanager.domain.enums.PaymentMethod;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

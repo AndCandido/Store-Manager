@@ -1,46 +1,39 @@
 package io.github.AndCandido.storemanager.domain.mappers;
 
 import io.github.AndCandido.storemanager.domain.dtos.CustomerDto;
-import io.github.AndCandido.storemanager.domain.dtos.SaleDto;
 import io.github.AndCandido.storemanager.domain.models.Customer;
-
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.UUID;
 
 public class CustomerMapper {
 
     public static CustomerDto toDto(Customer customer) {
         if (customer == null) return null;
 
-        var salesDto = SaleMapper.toCustomerResponseDtoList(customer.getSales());
-        var installmentsDto = InstallmentMapper.toResponseDtoList(customer.getInstallments());
+        var salesDto = SaleMapper.toDtoListWithoutAssociations(customer.getSales());
+        var installmentsDto = InstallmentMapper.toDtoListWithoutAssociations(customer.getInstallments());
 
-        return new CustomerDto(
-                customer.getId(),
-                customer.getName(),
-                customer.getCpf(),
-                customer.getNickname(),
-                customer.getAddress(),
-                customer.getPhone(),
-                salesDto,
-                installmentsDto,
-                customer.getCreatedAt()
-        );
+        return CustomerDto.builder()
+                .id(customer.getId())
+                .name(customer.getName())
+                .cpf( customer.getCpf())
+                .nickname(customer.getNickname())
+                .address(customer.getAddress())
+                .phone(customer.getPhone())
+                .sales(salesDto)
+                .installments(installmentsDto)
+                .createdAt(customer.getCreatedAt())
+                .build();
     }
 
-    public static CustomerDto toSaleResponseDto(Customer customer) {
+    public static CustomerDto toDtoWithoutAssociations(Customer customer) {
         return customer == null ? null
-                : new CustomerDto(
-                    customer.getId(),
-                    customer.getName(),
-                    customer.getCpf(),
-                    customer.getNickname(),
-                    customer.getAddress(),
-                    customer.getPhone(),
-                    null,
-                    null,
-                    customer.getCreatedAt()
-        );
+                : CustomerDto.builder()
+                .id(customer.getId())
+                .name(customer.getName())
+                .cpf( customer.getCpf())
+                .nickname(customer.getNickname())
+                .address(customer.getAddress())
+                .phone(customer.getPhone())
+                .createdAt(customer.getCreatedAt())
+                .build();
     }
 }

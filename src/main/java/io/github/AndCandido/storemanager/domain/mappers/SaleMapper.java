@@ -11,42 +11,33 @@ public class SaleMapper {
     public static SaleDto toDto(Sale sale) {
         if(sale == null) return null;
 
-        var customerResponse = CustomerMapper.toSaleResponseDto(sale.getCustomer());
+        var customerWithoutAssociations = CustomerMapper.toDtoWithoutAssociations(sale.getCustomer());
         var productsSoldDto = ProductSoldMapper.toDtoList(sale.getProductsSold());
-        var installmentsDto = InstallmentMapper.toResponseDtoList(sale.getInstallments());
+        var installmentsDto = InstallmentMapper.toDtoListWithoutAssociations(sale.getInstallments());
 
-        return new SaleDto(
-                sale.getId(),
-                customerResponse,
-                productsSoldDto,
-                installmentsDto,
-                sale.getPrice(),
-                sale.getCreatedAt()
-        );
+        return SaleDto.builder()
+                .id(sale.getId())
+                .customer(customerWithoutAssociations)
+                .productsSold(productsSoldDto)
+                .installments(installmentsDto)
+                .price(sale.getPrice())
+                .createdAt(sale.getCreatedAt())
+                        .build();
     }
 
 
-    public static SaleDto toCustomerResponseDto(Sale sale) {
+    public static SaleDto toDtoWithoutAssociations(Sale sale) {
         if(sale == null) return null;
 
-        return new SaleDto(
-                sale.getId(),
-                null,
-                null,
-                null,
-                sale.getPrice(),
-                sale.getCreatedAt()
-        );
+        return SaleDto.builder()
+                .id(sale.getId())
+                .price(sale.getPrice())
+                .createdAt(sale.getCreatedAt())
+                .build();
     }
 
-    public static Sale toModel(SaleDto saleDto) {
-        var saleModel = new Sale();
-        ApplicationUtil.copyNonNullProperties(saleDto, saleModel);
-        return saleModel;
-    }
-
-    public static List<SaleDto> toCustomerResponseDtoList(List<Sale> sale) {
+    public static List<SaleDto> toDtoListWithoutAssociations(List<Sale> sale) {
         return sale == null || sale.isEmpty() ? null :
-                sale.stream().map(SaleMapper::toCustomerResponseDto).toList();
+                sale.stream().map(SaleMapper::toDtoWithoutAssociations).toList();
     }
 }

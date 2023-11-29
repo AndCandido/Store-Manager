@@ -11,11 +11,13 @@ public class ProductSoldMapper {
         var product = productSold.getProduct();
 
         return productSold == null ? null
-            : new ProductSoldDto(
-                productSold.getId(),
-                product == null ? null : product.getId(),
-                productSold.getQuantity()
-        );
+            : ProductSoldDto.builder()
+                .id(productSold.getId())
+                .productId(product == null ? null : product.getId())
+                .quantity(productSold.getQuantity())
+                .build();
+
+
     }
 
     public static List<ProductSoldDto> toDtoList(List<ProductSold> productsSold) {
