@@ -6,8 +6,8 @@ import io.github.AndCandido.storemanager.api.exceptions.InvalidPaymentMethodExce
 
 public enum PaymentMethod {
     MONEY("money"),
-    DEBIT_CARD("debit_card"),
-    CREDIT_CARD("credit_card"),
+    DEBIT_CARD("debit card"),
+    CREDIT_CARD("credit card"),
     PIX("pix"),
     NEGOTIATED("negotiated"),
     NONE("none");
@@ -26,7 +26,7 @@ public enum PaymentMethod {
     @JsonCreator
     public static PaymentMethod fromString(String value) {
         for (PaymentMethod paymentMethod : PaymentMethod.values()) {
-            if (paymentMethod.name().equalsIgnoreCase(value)) {
+            if (paymentMethod.value.equalsIgnoreCase(value)) {
                 return paymentMethod;
             }
         }

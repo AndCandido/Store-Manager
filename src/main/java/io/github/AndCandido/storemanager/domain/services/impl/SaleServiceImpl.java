@@ -1,6 +1,8 @@
 package io.github.AndCandido.storemanager.domain.services.impl;
 
+import io.github.AndCandido.storemanager.api.exceptions.IllegalClientActionException;
 import io.github.AndCandido.storemanager.api.exceptions.ResourceNotFoundException;
+import io.github.AndCandido.storemanager.domain.dtos.InstallmentDto;
 import io.github.AndCandido.storemanager.domain.dtos.SaleDto;
 import io.github.AndCandido.storemanager.domain.models.ProductSold;
 import io.github.AndCandido.storemanager.domain.models.Sale;
@@ -36,6 +38,9 @@ public class SaleServiceImpl implements ISaleService {
         sale = saleRepository.save(sale);
 
         setCustomerOnSale(sale, saleDto);
+
+        checkIfInstallmentsIsValid(sale, saleDto);
+
         setProductSoldOnSale(sale, saleDto);
         setInstallmentsOnSale(sale, saleDto);
 
@@ -59,6 +64,8 @@ public class SaleServiceImpl implements ISaleService {
         var sale = getSaleById(id);
 
         setCustomerOnSale(sale, saleDto);
+
+        checkIfInstallmentsIsValid(sale, saleDto);
 
         for (ProductSold productSold : sale.getProductsSold()) {
             productService.returnStockQuantityByProductSold(productSold);
@@ -93,6 +100,19 @@ public class SaleServiceImpl implements ISaleService {
             var customer = customerService.getCustomerById(saleDto.customer().id());
             sale.setCustomer(customer);
         }
+    }
+
+    private void checkIfInstallmentsIsValid(Sale sale, SaleDto saleDto) {
+        for (InstallmentDto installmentDto : saleDto.installments()) {
+            if(installmentDto.isPaid() && installmentDto.paymentMethod() == null) {
+                throw new IllegalClientActionException("Deve se informado a forma de pagamento quando a parcela é paga");
+            }
+
+            if(sale.getCustomer() == null && !installmentDto.isPaid()) {
+                throw new IllegalClientActionException("Não pode haver parcelas não pagas caso a venda não tenha um cliente declarado");
+            }
+        }
+
     }
 
     private void setProductSoldOnSale(Sale sale, SaleDto saleDto) {

@@ -1,12 +1,32 @@
 package io.github.AndCandido.storemanager.domain.mappers;
 
 import io.github.AndCandido.storemanager.domain.dtos.InstallmentDto;
+import io.github.AndCandido.storemanager.domain.models.Customer;
 import io.github.AndCandido.storemanager.domain.models.Installment;
 import org.springframework.beans.BeanUtils;
 
 import java.util.List;
 
 public class InstallmentMapper {
+
+    public static InstallmentDto toDto(Installment installment) {
+        if(installment == null) return null;
+
+        var customerWithoutAssociations = CustomerMapper.toDtoWithoutAssociations(installment.getCustomer());
+        var saleWithoutAssociations = SaleMapper.toDtoWithoutAssociations(installment.getSale());
+
+        return InstallmentDto.builder()
+                .id(installment.getId())
+                .dueDate(installment.getDueDate())
+                .price(installment.getPrice())
+                .paymentMethod(installment.getPaymentMethod())
+                .isPaid(installment.isPaid())
+                .customer(customerWithoutAssociations)
+                .sale(saleWithoutAssociations)
+                .createdAt(installment.getCreatedAt())
+                .build();
+    }
+
     public static Installment toModel(InstallmentDto installmentDto) {
         var installment = new Installment();
         BeanUtils.copyProperties(installmentDto, installment);
