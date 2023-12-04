@@ -2,7 +2,6 @@ package io.github.AndCandido.storemanager.domain.mappers;
 
 import io.github.AndCandido.storemanager.domain.dtos.SaleDto;
 import io.github.AndCandido.storemanager.domain.models.Sale;
-import io.github.AndCandido.storemanager.utils.ApplicationUtil;
 
 import java.util.List;
 

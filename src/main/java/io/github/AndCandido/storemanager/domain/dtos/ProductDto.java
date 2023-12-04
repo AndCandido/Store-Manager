@@ -8,7 +8,6 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import org.hibernate.validator.constraints.Length;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -26,7 +25,7 @@ public record ProductDto(
 
         @NotNull(message = "{product.field.price.null}")
         @Min(value = 0, message = "{product.field.price.min}")
-        BigDecimal price,
+        Double price,
 
         @NotNull(message = "{product.field.stockQuantity.null}")
         @Min(value = 0, message = "{product.field.stockQuantity.min}")

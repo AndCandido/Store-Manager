@@ -7,7 +7,6 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -31,7 +30,7 @@ public record SaleDto(
 
         @NotNull(message = "{sale.field.price.null}")
         @Min(value = 0, message = "{sale.field.price.min}")
-        BigDecimal price,
+        Double price,
 
         LocalDateTime createdAt
 ) {

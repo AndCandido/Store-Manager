@@ -6,7 +6,6 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.Builder;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -21,12 +20,12 @@ public record InstallmentDto(
 
     @NotNull(message = "{installment.field.price.null}")
     @Min(value = 0, message = "{installment.field.price.min}")
-    BigDecimal price,
+    Double price,
 
     PaymentMethod paymentMethod,
 
     @NotNull(message = "{installment.field.isPaid.null}")
-    boolean isPaid,
+    Boolean isPaid,
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @Valid

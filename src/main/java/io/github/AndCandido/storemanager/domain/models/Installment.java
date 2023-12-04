@@ -8,7 +8,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -28,12 +27,12 @@ public class Installment {
     private LocalDate dueDate;
 
     @Column(nullable = false)
-    private BigDecimal price;
+    private Double price;
 
     private PaymentMethod paymentMethod;
 
     @Column(nullable = false)
-    private boolean isPaid;
+    private Boolean isPaid;
 
     @ManyToOne
     private Customer customer;

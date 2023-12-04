@@ -19,11 +19,11 @@ public record CustomerDto(
         @Length(max = 70, message = "{customer.field.name.length}")
         String name,
 
+        String nickname,
+
         @NotBlank(message = "{customer.field.cpf.blank}")
         @CPF(message = "{customer.field.cpf.invalid}")
         String cpf,
-
-        String nickname,
 
         @NotBlank(message = "{customer.field.address.blank}")
         String address,

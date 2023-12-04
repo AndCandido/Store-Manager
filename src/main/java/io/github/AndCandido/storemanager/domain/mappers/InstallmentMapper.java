@@ -1,8 +1,7 @@
 package io.github.AndCandido.storemanager.domain.mappers;
 
-import io.github.AndCandido.storemanager.domain.dtos.InstallmentDto;
-import io.github.AndCandido.storemanager.domain.models.Customer;
 import io.github.AndCandido.storemanager.domain.models.Installment;
+import io.github.AndCandido.storemanager.domain.dtos.InstallmentDto;
 import org.springframework.beans.BeanUtils;
 
 import java.util.List;
@@ -20,7 +19,7 @@ public class InstallmentMapper {
                 .dueDate(installment.getDueDate())
                 .price(installment.getPrice())
                 .paymentMethod(installment.getPaymentMethod())
-                .isPaid(installment.isPaid())
+                .isPaid(installment.getIsPaid())
                 .customer(customerWithoutAssociations)
                 .sale(saleWithoutAssociations)
                 .createdAt(installment.getCreatedAt())
@@ -41,7 +40,7 @@ public class InstallmentMapper {
                 .dueDate(installment.getDueDate())
                 .price(installment.getPrice())
                 .paymentMethod(installment.getPaymentMethod())
-                .isPaid(installment.isPaid())
+                .isPaid(installment.getIsPaid())
                 .createdAt(installment.getCreatedAt())
                 .build();
     }
