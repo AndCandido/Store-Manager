@@ -64,8 +64,8 @@ public class ApplicationIT {
         var tomorrowDate = LocalDate.now().plusDays(1);
 
         installmentsDto.addAll(List.of(
-                createInstallment(tomorrowDate.toString(), 123, "DEBIT_CARD", true),
-                createInstallment(tomorrowDate.toString(), 123, "NONE", false)
+                createInstallment(tomorrowDate.toString(), 30, "DEBIT_CARD", true),
+                createInstallment(tomorrowDate.toString(), 40, "NONE", false)
         ));
 
         customers.addAll(List.of(
@@ -75,7 +75,7 @@ public class ApplicationIT {
         ));
 
         sales.add(
-                saveSale(createSaleDto(customers.get(0), 149.99, productsSoldDto, installmentsDto))
+                saveSale(createSaleDto(customers.get(0), 200.99, productsSoldDto, installmentsDto))
         );
 
         productsSoldDto = productSoldRepository.findAll().stream().map(ProductSoldMapper::toDto).toList();

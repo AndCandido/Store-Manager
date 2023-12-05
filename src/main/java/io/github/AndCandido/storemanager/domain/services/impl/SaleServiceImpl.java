@@ -1,35 +1,33 @@
 package io.github.AndCandido.storemanager.domain.services.impl;
 
-import io.github.AndCandido.storemanager.api.exceptions.IllegalClientActionException;
 import io.github.AndCandido.storemanager.api.exceptions.ResourceNotFoundException;
+import io.github.AndCandido.storemanager.domain.dtos.CustomerDto;
 import io.github.AndCandido.storemanager.domain.dtos.InstallmentDto;
+import io.github.AndCandido.storemanager.domain.dtos.ProductSoldDto;
 import io.github.AndCandido.storemanager.domain.dtos.SaleDto;
+import io.github.AndCandido.storemanager.domain.models.Customer;
+import io.github.AndCandido.storemanager.domain.models.Installment;
 import io.github.AndCandido.storemanager.domain.models.ProductSold;
 import io.github.AndCandido.storemanager.domain.models.Sale;
 import io.github.AndCandido.storemanager.domain.repositories.ISaleRepository;
 import io.github.AndCandido.storemanager.domain.services.*;
+import io.github.AndCandido.storemanager.domain.validators.InstallmentValidator;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
 @Service
+@RequiredArgsConstructor
 public class SaleServiceImpl implements ISaleService {
 
-    private ISaleRepository saleRepository;
-    private IProductService productService;
-    private IProductSoldService productSoldService;
-    private ICustomerService customerService;
-    private IInstallmentService installmentService;
-
-    public SaleServiceImpl(ISaleRepository saleRepository, IProductService productService, IProductSoldService productSoldService, ICustomerService customerService, IInstallmentService installmentService) {
-        this.saleRepository = saleRepository;
-        this.productService = productService;
-        this.productSoldService = productSoldService;
-        this.customerService = customerService;
-        this.installmentService = installmentService;
-    }
+    private final ISaleRepository saleRepository;
+    private final IProductService productService;
+    private final IProductSoldService productSoldService;
+    private final ICustomerService customerService;
+    private final IInstallmentService installmentService;
 
     @Override
     @Transactional
@@ -37,12 +35,10 @@ public class SaleServiceImpl implements ISaleService {
         var sale = createSale(saleDto);
         sale = saleRepository.save(sale);
 
-        setCustomerOnSale(sale, saleDto);
+        handlerCustomer(sale, saleDto);
+        handlerProductsSold(sale, saleDto);
+        handlerInstallments(sale, saleDto);
 
-        checkIfInstallmentsIsValid(sale, saleDto);
-
-        setProductSoldOnSale(sale, saleDto);
-        setInstallmentsOnSale(sale, saleDto);
 
         return sale;
     }
@@ -63,22 +59,18 @@ public class SaleServiceImpl implements ISaleService {
     public Sale updateSale(SaleDto saleDto, UUID id) {
         var sale = getSaleById(id);
 
-        setCustomerOnSale(sale, saleDto);
+        handlerCustomer(sale, saleDto);
 
-        checkIfInstallmentsIsValid(sale, saleDto);
+        handlerReturnStockQuantityForProducts(sale);
 
-        for (ProductSold productSold : sale.getProductsSold()) {
-            productService.returnStockQuantityByProductSold(productSold);
-            productSoldService.deleteProductSold(productSold.getId());
-        }
-
-        sale.getProductsSold().clear();
-        setProductSoldOnSale(sale, saleDto);
+        handlerProductsSold(sale, saleDto);
+        handlerInstallments(sale, saleDto);
 
         return saleRepository.save(sale);
     }
 
     @Override
+    @Transactional
     public void deleteSale(UUID id) {
         var sale = getSaleById(id);
 
@@ -95,33 +87,56 @@ public class SaleServiceImpl implements ISaleService {
         return sale;
     }
 
-    private void setCustomerOnSale(Sale sale, SaleDto saleDto) {
-        if(saleDto.customer() != null) {
-            var customer = customerService.getCustomerById(saleDto.customer().id());
+    private void handlerCustomer(Sale sale, SaleDto saleDto) {
+        var customer = getCustomer(saleDto.customer());
+
+        if(customer != null) {
             sale.setCustomer(customer);
         }
     }
 
-    private void checkIfInstallmentsIsValid(Sale sale, SaleDto saleDto) {
-        for (InstallmentDto installmentDto : saleDto.installments()) {
-            if(installmentDto.isPaid() && installmentDto.paymentMethod() == null) {
-                throw new IllegalClientActionException("Deve se informado a forma de pagamento quando a parcela é paga");
-            }
+    private void handlerProductsSold(Sale sale, SaleDto saleDto) {
+        for (ProductSoldDto productSoldDto : saleDto.productsSold()) {
+            var productSold = createProductSold(productSoldDto);
+            productSold.setSale(sale);
+            sale.getProductsSold().add(productSold);
+        }
+    }
 
-            if(sale.getCustomer() == null && !installmentDto.isPaid()) {
-                throw new IllegalClientActionException("Não pode haver parcelas não pagas caso a venda não tenha um cliente declarado");
-            }
+    private void handlerInstallments(Sale sale, SaleDto saleDto) {
+        double totalPrice = 0;
+        for (InstallmentDto installmentDto : saleDto.installments()) {
+            InstallmentValidator.validateInstallmentBySale(saleDto, installmentDto);
+
+            var installment = createInstallment(installmentDto);
+            installment.setCustomer(sale.getCustomer());
+            installment.setSale(sale);
+
+            sale.getInstallments().add(installment);
+
+            totalPrice += installmentDto.price();
         }
 
+        InstallmentValidator.validateInstallmentTotalPrice(totalPrice, saleDto.price());
     }
 
-    private void setProductSoldOnSale(Sale sale, SaleDto saleDto) {
-        var productsSoldSaved = productSoldService.saveProductsSoldBySale(sale, saleDto);
-        sale.setProductsSold(productsSoldSaved);
+    private void handlerReturnStockQuantityForProducts(Sale sale) {
+        for (ProductSold productSold : sale.getProductsSold()) {
+            productService.returnStockQuantityByProductSold(productSold);
+            productSoldService.deleteProductSold(productSold.getId());
+        }
+        sale.getProductsSold().clear();
     }
 
-    private void setInstallmentsOnSale(Sale sale, SaleDto saleDto) {
-        var installmentsSaved = installmentService.saveInstallmentBySale(sale, saleDto);
-        sale.setInstallments(installmentsSaved);
+    private Customer getCustomer(CustomerDto customerDto) {
+        return customerService.getCustomerById(customerDto.id());
+    }
+
+    private ProductSold createProductSold(ProductSoldDto productSoldDto) {
+        return productSoldService.createProductSold(productSoldDto);
+    }
+
+    private Installment createInstallment(InstallmentDto installmentDto) {
+        return installmentService.createInstallment(installmentDto);
     }
 }

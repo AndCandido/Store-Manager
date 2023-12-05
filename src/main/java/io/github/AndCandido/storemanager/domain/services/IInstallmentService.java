@@ -1,5 +1,6 @@
 package io.github.AndCandido.storemanager.domain.services;
 
+import io.github.AndCandido.storemanager.domain.dtos.InstallmentDto;
 import io.github.AndCandido.storemanager.domain.dtos.SaleDto;
 import io.github.AndCandido.storemanager.domain.models.Installment;
 import io.github.AndCandido.storemanager.domain.models.Sale;
@@ -13,6 +14,7 @@ public interface IInstallmentService {
 
     Installment findById(UUID id);
 
-    List<Installment> saveInstallmentBySale(Sale sale, SaleDto saleDto);
+    Installment patchInstallment(InstallmentDto installmentDto, UUID id);
 
+    Installment createInstallment(InstallmentDto installmentDto);
 }

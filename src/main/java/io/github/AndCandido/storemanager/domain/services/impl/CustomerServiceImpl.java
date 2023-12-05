@@ -6,6 +6,7 @@ import io.github.AndCandido.storemanager.api.exceptions.ResourceNotFoundExceptio
 import io.github.AndCandido.storemanager.domain.models.Customer;
 import io.github.AndCandido.storemanager.domain.repositories.ICustomerRepository;
 import io.github.AndCandido.storemanager.utils.ApplicationUtil;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,10 +15,10 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class CustomerServiceImpl implements ICustomerService {
 
-    @Autowired
-    private ICustomerRepository customerRepository;
+    private final ICustomerRepository customerRepository;
 
     @Override
     public Customer saveCustomer(CustomerDto customerDto) {

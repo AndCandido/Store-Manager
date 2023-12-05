@@ -6,6 +6,7 @@ import io.github.AndCandido.storemanager.domain.mappers.ProductMapper;
 import io.github.AndCandido.storemanager.domain.models.Product;
 import io.github.AndCandido.storemanager.domain.services.IProductService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,10 +17,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/products")
+@RequiredArgsConstructor
 public class ProductController {
 
-    @Autowired
-    private IProductService productService;
+    private final IProductService productService;
 
     @PostMapping
     public ResponseEntity<ProductDto> saveProduct(@RequestBody @Valid ProductDto productDto) {

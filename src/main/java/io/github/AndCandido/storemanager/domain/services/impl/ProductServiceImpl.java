@@ -8,19 +8,17 @@ import io.github.AndCandido.storemanager.api.exceptions.ResourceNotFoundExceptio
 import io.github.AndCandido.storemanager.domain.models.Product;
 import io.github.AndCandido.storemanager.domain.repositories.IProductRepository;
 import io.github.AndCandido.storemanager.utils.ApplicationUtil;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class ProductServiceImpl implements IProductService {
 
-    private IProductRepository productRepository;
-
-    public ProductServiceImpl(IProductRepository productRepository) {
-        this.productRepository = productRepository;
-    }
+    private final IProductRepository productRepository;
 
     @Override
     public Product saveProduct(ProductDto productDto) {

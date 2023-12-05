@@ -1,6 +1,5 @@
 package io.github.AndCandido.storemanager.domain.services.impl;
 
-import io.github.AndCandido.storemanager.api.exceptions.IllegalClientActionException;
 import io.github.AndCandido.storemanager.api.exceptions.ResourceNotFoundException;
 import io.github.AndCandido.storemanager.domain.dtos.InstallmentDto;
 import io.github.AndCandido.storemanager.domain.dtos.SaleDto;
@@ -9,6 +8,8 @@ import io.github.AndCandido.storemanager.domain.models.Installment;
 import io.github.AndCandido.storemanager.domain.models.Sale;
 import io.github.AndCandido.storemanager.domain.repositories.IInstallmentRepository;
 import io.github.AndCandido.storemanager.domain.services.IInstallmentService;
+import io.github.AndCandido.storemanager.utils.ApplicationUtil;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -16,20 +17,13 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class InstallmentServiceImpl implements IInstallmentService {
 
-    private IInstallmentRepository installmentRepository;
-
-    public InstallmentServiceImpl(IInstallmentRepository installmentRepository) {
-        this.installmentRepository = installmentRepository;
-    }
+    private final IInstallmentRepository installmentRepository;
 
     @Override
     public Installment saveInstallment(Installment installment) {
-        if(installment.isPaid() && installment.getPaymentMethod() == null) {
-            throw new IllegalClientActionException("Deve se informado a forma de pagamento quando a parcela é paga");
-        }
-
         return installmentRepository.save(installment);
     }
 
@@ -40,21 +34,16 @@ public class InstallmentServiceImpl implements IInstallmentService {
     }
 
     @Override
-    public List<Installment> saveInstallmentBySale(Sale sale, SaleDto saleDto) {
-        var installments = new ArrayList<Installment>(saleDto.installments().size());
+    public Installment patchInstallment(InstallmentDto installmentDto, UUID id) {
+        var installmentExisting = findById(id);
 
-        for (InstallmentDto installmentDto : saleDto.installments()) {
-            var installment = InstallmentMapper.toModel(installmentDto);
+        ApplicationUtil.copyNonNullProperties(installmentDto, installmentExisting);
 
-            installment.setCustomer(sale.getCustomer());
-            installment.setSale(sale);
-
-            installments.add(installment);
-        }
-
-        return installments;
+        return saveInstallment(installmentExisting);
     }
 
-
-
+    @Override
+    public Installment createInstallment(InstallmentDto installmentDto) {
+        return InstallmentMapper.toModel(installmentDto);
+    }
 }

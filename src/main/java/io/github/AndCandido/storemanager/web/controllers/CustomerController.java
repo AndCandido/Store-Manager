@@ -5,6 +5,7 @@ import io.github.AndCandido.storemanager.domain.mappers.CustomerMapper;
 import io.github.AndCandido.storemanager.domain.models.Customer;
 import io.github.AndCandido.storemanager.domain.services.ICustomerService;
 import jakarta.validation.*;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,10 +17,10 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/customers")
+@RequiredArgsConstructor
 public class CustomerController {
 
-    @Autowired
-    private ICustomerService customerService;
+    private final ICustomerService customerService;
 
     @PostMapping
     public ResponseEntity<CustomerDto> saveCustomer(@RequestBody @Valid CustomerDto customerDto) {

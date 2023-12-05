@@ -5,6 +5,7 @@ import io.github.AndCandido.storemanager.domain.mappers.SaleMapper;
 import io.github.AndCandido.storemanager.domain.models.Sale;
 import io.github.AndCandido.storemanager.domain.services.ISaleService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,13 +16,10 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/sales")
+@RequiredArgsConstructor
 public class SaleController {
 
-    private ISaleService saleService;
-
-    public SaleController(ISaleService saleService) {
-        this.saleService = saleService;
-    }
+    private final ISaleService saleService;
 
     @PostMapping
     public ResponseEntity<SaleDto> saveSale(@RequestBody @Valid SaleDto saleDto) {

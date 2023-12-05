@@ -4,28 +4,21 @@ import io.github.AndCandido.storemanager.domain.dtos.InstallmentDto;
 import io.github.AndCandido.storemanager.domain.mappers.InstallmentMapper;
 import io.github.AndCandido.storemanager.domain.services.IInstallmentService;
 import io.github.AndCandido.storemanager.utils.ApplicationUtil;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/installments")
+@RequiredArgsConstructor
 public class InstallmentController {
 
-    private IInstallmentService installmentService;
-
-    public InstallmentController(IInstallmentService installmentService) {
-        this.installmentService = installmentService;
-    }
+    private final IInstallmentService installmentService;
 
     @PatchMapping("{id}")
     public InstallmentDto patchInstallment(@RequestBody InstallmentDto installmentDto, @PathVariable UUID id) {
-        var existingInstallment = installmentService.findById(id);
-
-        ApplicationUtil.copyNonNullProperties(installmentDto, existingInstallment);
-
-        var installmentUpdated = installmentService.saveInstallment(existingInstallment);
-
+        var installmentUpdated = installmentService.patchInstallment(installmentDto, id);
         return InstallmentMapper.toDto(installmentUpdated);
     }
 
