@@ -58,24 +58,21 @@ public class ApplicationIT {
         productsSoldDto.addAll(List.of(
                 createProductSoldDto(products.get(0), 4),
                 createProductSoldDto(products.get(1), 1),
-                createProductSoldDto(products.get(3), 4)
+                createProductSoldDto(products.get(2), 4)
         ));
 
         var tomorrowDate = LocalDate.now().plusDays(1);
 
         installmentsDto.addAll(List.of(
-                createInstallment(tomorrowDate.toString(), 30, "DEBIT_CARD", true),
-                createInstallment(tomorrowDate.toString(), 40, "NONE", false)
+                createInstallment(tomorrowDate.toString(), 100, "DEBIT_CARD", true)
         ));
 
         customers.addAll(List.of(
-                saveCustomer(createCustomer("Alberto Lima Castro", "021.419.780-84", null, "Rua. ", null)),
-                saveCustomer(createCustomer("Augusto Ribeiro Arcanjo ", "021.419.780-84", null, "Rua. ", null)),
-                saveCustomer(createCustomer("Júlio Antônia Cardoso Castro", "021.419.780-84", "Comercio do Júlio", "Rua. ", null))
+                saveCustomer(createCustomer("Alberto Lima Castro", "021.419.780-84", null, "Rua. ", null))
         ));
 
         sales.add(
-                saveSale(createSaleDto(customers.get(0), 200.99, productsSoldDto, installmentsDto))
+                saveSale(createSaleDto(customers.get(0), 200, productsSoldDto, installmentsDto))
         );
 
         productsSoldDto = productSoldRepository.findAll().stream().map(ProductSoldMapper::toDto).toList();
