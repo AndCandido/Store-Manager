@@ -1,6 +1,8 @@
 package io.github.AndCandido.storemanager.domain.dtos;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import io.github.AndCandido.storemanager.domain.annotations.ValidateInstallmentDto;
+import io.github.AndCandido.storemanager.domain.annotations.enums.InstallmentDtoFieldsValidator;
 import io.github.AndCandido.storemanager.domain.enums.PaymentMethod;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
@@ -11,6 +13,12 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Builder
+@ValidateInstallmentDto.List({
+    @ValidateInstallmentDto(
+        message = "Caso a parcela for paga, deve haver um método de pagamento, caso contrário, não deve conter",
+        fieldsValidator = InstallmentDtoFieldsValidator.HAVE_PAYMENT_METHOD_WHEN_IS_PAID
+    )
+})
 public record InstallmentDto(
     UUID id,
 

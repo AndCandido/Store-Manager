@@ -20,6 +20,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
@@ -67,8 +68,10 @@ public class SaleIT {
                 createProductSoldDto(products.get(3), 8)
         );
 
+        var tomorrowDate = LocalDate.now().plusDays(1);
+
         installmentsDto = List.of(
-                createInstallment("2023-12-12", 120.90, "PIX", true)
+                createInstallment(tomorrowDate.toString(), 120.90, "PIX", true)
         );
 
         customer = customerRepository.save(createCustomer());
@@ -192,7 +195,7 @@ public class SaleIT {
         saleSaved = saveSaleDto();
 
         var res = restTemplate.exchange(
-                URI + "/" + saleSaved.id(),
+            URI + "/" + saleSaved.id(),
                 HttpMethod.DELETE,
                 null,
                 Void.class

@@ -11,7 +11,6 @@ import io.github.AndCandido.storemanager.domain.models.ProductSold;
 import io.github.AndCandido.storemanager.domain.models.Sale;
 import io.github.AndCandido.storemanager.domain.repositories.ISaleRepository;
 import io.github.AndCandido.storemanager.domain.services.*;
-import io.github.AndCandido.storemanager.domain.validators.InstallmentValidator;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
@@ -38,7 +37,6 @@ public class SaleServiceImpl implements ISaleService {
         handlerCustomer(sale, saleDto);
         handlerProductsSold(sale, saleDto);
         handlerInstallments(sale, saleDto);
-
 
         return sale;
     }
@@ -106,8 +104,6 @@ public class SaleServiceImpl implements ISaleService {
     private void handlerInstallments(Sale sale, SaleDto saleDto) {
         double totalPrice = 0;
         for (InstallmentDto installmentDto : saleDto.installments()) {
-            InstallmentValidator.validateInstallmentBySale(saleDto, installmentDto);
-
             var installment = createInstallment(installmentDto);
             installment.setCustomer(sale.getCustomer());
             installment.setSale(sale);
@@ -116,8 +112,6 @@ public class SaleServiceImpl implements ISaleService {
 
             totalPrice += installmentDto.price();
         }
-
-        InstallmentValidator.validateInstallmentTotalPrice(totalPrice, saleDto.price());
     }
 
     private void handlerReturnStockQuantityForProducts(Sale sale) {
