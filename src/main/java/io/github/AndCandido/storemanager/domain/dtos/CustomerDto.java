@@ -13,31 +13,32 @@ import java.util.UUID;
 
 @Builder
 public record CustomerDto(
-        UUID id,
 
-        @NotBlank(message = "{customer.field.name.blank}")
-        @Length(max = 70, message = "{customer.field.name.length}")
-        String name,
+   UUID id,
 
-        String nickname,
+    @NotBlank(message = "{customer.field.name.blank}")
+    @Length(max = 70, message = "{customer.field.name.length}")
+    String name,
 
-        @NotBlank(message = "{customer.field.cpf.blank}")
-        @CPF(message = "{customer.field.cpf.invalid}")
-        String cpf,
+    String nickname,
 
-        @NotBlank(message = "{customer.field.address.blank}")
-        String address,
+    @NotBlank(message = "{customer.field.cpf.blank}")
+    @CPF(message = "{customer.field.cpf.invalid}")
+    String cpf,
 
-        String phone,
+    @NotBlank(message = "{customer.field.address.blank}")
+    String address,
 
-        @JsonInclude(JsonInclude.Include.NON_NULL)
-        @Valid
-        List<SaleDto> sales,
+    String phone,
 
-        @JsonInclude(JsonInclude.Include.NON_NULL)
-        @Valid
-        List<InstallmentDto> installments,
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @Valid
+    List<SaleDto> sales,
 
-        LocalDateTime createdAt
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @Valid
+    List<InstallmentDto> installments,
+
+    LocalDateTime createdAt
 ) {
 }

@@ -1,167 +1,125 @@
 package io.github.AndCandido.storemanager.services.IntegrationTests;
 
 import io.github.AndCandido.storemanager.domain.dtos.ProductDto;
-import io.github.AndCandido.storemanager.domain.models.Product;
-import io.github.AndCandido.storemanager.domain.repositories.IProductRepository;
-import io.github.AndCandido.storemanager.services.utils.ProductCreator;
+import io.github.AndCandido.storemanager.services.dataTest.ProductDataTest;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
-import java.util.Arrays;
 import java.util.List;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureTestDatabase
 public class ProductIT {
 
-    private final String URI = "/products";
+    private final ProductDataTest productData;
 
     @Autowired
-    private TestRestTemplate restTemplate;
-    @Autowired
-    private IProductRepository productRepository;
+    public ProductIT(ProductDataTest productDataTest) {
+        this.productData = productDataTest
+            .createProducts();
+    }
+
+    @AfterEach
+    void cleanDataBase() {
+        productData.cleanDataBase();
+    }
 
     @Test
     public void saveProducts_Success() {
-        ProductDto[] products = {
-                ProductCreator.createDto("Calça", 129, 5),
-                ProductCreator.createDto("Camisa", 90.05, 1),
-                ProductCreator.createDto("Blusa", 102.99, 6)
-        };
-
-        for (ProductDto product : products) {
-            var response = restTemplate.postForEntity(URI, product, Product.class);
-            var body = response.getBody();
-
+        for (ProductDto product : productData.getProductsDto()) {
+            ResponseEntity<ProductDto> response = productData.saveProduct(product);
             Assertions.assertEquals(HttpStatus.CREATED, response.getStatusCode());
+            ProductDto body = response.getBody();
+
             Assertions.assertNotNull(body);
-            Assertions.assertNotNull(body.getId());
-            Assertions.assertNotNull(body.getCreatedAt());
+            Assertions.assertNotNull(body.id());
+            Assertions.assertNotNull(body.createdAt());
 
-            Assertions.assertEquals(product.name(), body.getName());
-            Assertions.assertEquals(product.price(), body.getPrice());
-            Assertions.assertEquals(product.stockQuantity(), body.getStockQuantity());
+            Assertions.assertEquals(product.name(), body.name());
+            Assertions.assertEquals(product.price(), body.price());
+            Assertions.assertEquals(product.stockQuantity(), body.stockQuantity());
         }
-
-        productRepository.deleteAll();
     }
 
     @Test
     public void getAllProducts_Success() {
-        Product[] productsSaved = {
-            ProductCreator.createModel("Meia", 18.99, 5),
-            ProductCreator.createModel("Meia", 18.99, 5)
-        };
+        productData.saveProducts();
 
-        productRepository.saveAll(Arrays.stream(productsSaved).toList());
-
-        var response = restTemplate.exchange(
-                URI,
-                HttpMethod.GET,
-                null,
-                new ParameterizedTypeReference<List<Product>>() {}
-        );
-
-        var body = response.getBody();
+        ResponseEntity<List<ProductDto>> response = productData.findAllProducts();
+        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
+        List<ProductDto> body = response.getBody();
 
         Assertions.assertNotNull(body);
-        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
-        Assertions.assertEquals(body.size(), productsSaved.length);
+        Assertions.assertEquals(body.size(), productData.getProductsDto().size());
 
         for (int i = 0; i < body.size(); i++) {
-            var productSaved = productsSaved[i];
+            var productSaved = productData.getProductDto(i);
             var productBody = body.get(i);
 
-            Assertions.assertNotNull(productBody.getId());
-            Assertions.assertNotNull(productBody.getCreatedAt());
+            Assertions.assertNotNull(productBody.id());
+            Assertions.assertNotNull(productBody.createdAt());
 
-            Assertions.assertEquals(productSaved.getName(), productBody.getName());
-            Assertions.assertEquals(productSaved.getPrice(), productBody.getPrice());
-            Assertions.assertEquals(productSaved.getStockQuantity(), productBody.getStockQuantity());
-
+            Assertions.assertEquals(productSaved.name(), productBody.name());
+            Assertions.assertEquals(productSaved.price(), productBody.price());
+            Assertions.assertEquals(productSaved.stockQuantity(), productBody.stockQuantity());
         }
-
-        productRepository.deleteAll();
     }
 
     @Test
     public void getAllProducts_NoContent() {
-        var response = restTemplate.exchange(
-                URI,
-                HttpMethod.GET,
-                null,
-                new ParameterizedTypeReference<List<Product>>() {}
-        );
-
-        var body = response.getBody();
+        ResponseEntity<List<ProductDto>> response = productData.findAllProducts();
+        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
+        List<ProductDto> body = response.getBody();
 
         Assertions.assertNotNull(body);
-        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
         Assertions.assertTrue(body.isEmpty());
     }
 
     @Test
-    public void updateProduct_Success() {
-        var productSaved = productRepository.save(
-                ProductCreator.createModel("Bolsa", 13, 3)
-        );
+    public void updateProducts_Success() {
+        productData.saveProducts();
 
-        var productForUpdate = ProductCreator.createDto(
-                "Bolsa", 13.05, 3
-        );
+        for (ProductDto productDto : productData.getProductsDto()) {
 
-        var productSavedId = productSaved.getId();
+            var productDtoToUpdate = ProductDto.builder()
+                    .id(productDto.id())
+                    .name("CHANGED " + productDto.name())
+                    .price(productDto.price() + 10)
+                    .stockQuantity(productDto.stockQuantity() + 5)
+                    .createdAt(productDto.createdAt())
+                    .build();
 
-        var response = restTemplate.exchange(
-                getUriWithId(productSavedId),
-                HttpMethod.PUT,
-                new HttpEntity<ProductDto>(productForUpdate),
-                Product.class
-        );
+            ResponseEntity<ProductDto> response = productData.updateProduct(productDtoToUpdate);
+            Assertions.assertEquals(HttpStatus.CREATED, response.getStatusCode());
+            ProductDto body = response.getBody();
 
-        var body = response.getBody();
-
-        Assertions.assertNotNull(body);
-        Assertions.assertEquals(HttpStatus.CREATED, response.getStatusCode());
-
-        Assertions.assertEquals(productSavedId, body.getId());
-        Assertions.assertEquals(productSaved.getCreatedAt(), body.getCreatedAt());
-        Assertions.assertEquals(productForUpdate.name(), body.getName());
-        Assertions.assertEquals(productForUpdate.price(), body.getPrice());
-        Assertions.assertEquals(productForUpdate.stockQuantity(), body.getStockQuantity());
-
-        productRepository.deleteAll();
+            Assertions.assertNotNull(body);
+            Assertions.assertEquals(productDtoToUpdate.id(), body.id());
+            Assertions.assertEquals(productDtoToUpdate.createdAt(), body.createdAt());
+            Assertions.assertEquals(productDtoToUpdate.name(), body.name());
+            Assertions.assertEquals(productDtoToUpdate.price(), body.price());
+            Assertions.assertEquals(productDtoToUpdate.stockQuantity(), body.stockQuantity());
+        }
     }
 
     @Test
     public void deleteProduct_Success() {
-        var productSaved = productRepository.save(
-                ProductCreator.createModel("Meia", 12.99, 2)
-        );
+        productData.saveProducts();
 
-        var productSavedId = productSaved.getId();
-        var response = restTemplate.exchange(
-                getUriWithId(productSavedId),
-                HttpMethod.DELETE,
-                null,
-                Void.class
-        );
+        for (ProductDto productDto : productData.getProductsDto()) {
+            ResponseEntity<Void> deleteResponse = productData.deleteProduct(productDto);
 
-        Assertions.assertNull(response.getBody());
-        Assertions.assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+            Assertions.assertNull(deleteResponse.getBody());
+            Assertions.assertEquals(HttpStatus.NO_CONTENT, deleteResponse.getStatusCode());
 
-        var productDeletedFound = productRepository.findById(productSavedId);
-        Assertions.assertTrue(productDeletedFound.isEmpty());
-    }
-    private String getUriWithId(Long id) {
-        return URI + "/" + id;
+            ResponseEntity<ProductDto> responseProductDeleted = productData.findProduct(productDto);
+            Assertions.assertEquals(HttpStatus.NOT_FOUND, responseProductDeleted.getStatusCode());
+        }
     }
 }

@@ -1,26 +1,19 @@
 package io.github.AndCandido.storemanager.services.IntegrationTests;
 
-import io.github.AndCandido.storemanager.domain.dtos.InstallmentDto;
-import io.github.AndCandido.storemanager.domain.dtos.ProductSoldDto;
-import io.github.AndCandido.storemanager.domain.dtos.SaleDto;
-import io.github.AndCandido.storemanager.domain.mappers.CustomerMapper;
-import io.github.AndCandido.storemanager.domain.models.Customer;
-import io.github.AndCandido.storemanager.domain.models.Product;
-import io.github.AndCandido.storemanager.domain.repositories.ICustomerRepository;
-import io.github.AndCandido.storemanager.domain.repositories.IProductRepository;
-import io.github.AndCandido.storemanager.domain.repositories.ISaleRepository;
-import io.github.AndCandido.storemanager.services.utils.*;
+import io.github.AndCandido.storemanager.domain.dtos.*;
+import io.github.AndCandido.storemanager.services.creators.*;
+import io.github.AndCandido.storemanager.services.dataTest.ProductDataTest;
+import io.github.AndCandido.storemanager.services.dataTest.CustomerDataTest;
+import io.github.AndCandido.storemanager.services.dataTest.InstallmentDataTest;
+import io.github.AndCandido.storemanager.services.dataTest.ProductSoldDataTest;
+import io.github.AndCandido.storemanager.services.dataTest.SaleDataTest;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
-import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
@@ -29,86 +22,41 @@ import java.util.Objects;
 @AutoConfigureTestDatabase
 public class SaleIT {
 
-    private final String URI = "/sales";
+    private final ProductDataTest productData;
+    private final CustomerDataTest customerData;
+    private final ProductSoldDataTest productSoldData;
+    private final InstallmentDataTest installmentData;
+    private final SaleDataTest saleData;
 
     @Autowired
-    private TestRestTemplate restTemplate;
-    @Autowired
-    private ISaleRepository saleRepository;
-    @Autowired
-    private IProductRepository productRepository;
-    @Autowired
-    private ICustomerRepository customerRepository;
-
-    private List<Product> products;
-    private HashMap<Long, Product> productsMappedOriginal = new HashMap<>();
-    private HashMap<Long, Product> productsMappedUpdated = new HashMap<>();
-    private List<ProductSoldDto> productsSoldDto;
-    private List<InstallmentDto> installmentsDto;
-    private Customer customer;
-    private SaleDto saleSaved;
-    private SaleDto saleDto;
-
-    @BeforeEach
-    void beforeEach() {
-        products = productRepository.saveAll(List.of(
-                createProduct("Meia Social", 19.99, 18),
-                createProduct("Calça social", 185.05, 4),
-                createProduct("Blusa Juvenil Tam P", 45.50, 10),
-                createProduct("Camisa Golo Polo", 90, 11),
-                createProduct("Short curto", 18.0, 1)
-        ));
-
-        instanceProductsMapped(productsMappedOriginal, products);
-
-        productsSoldDto = List.of(
-                createProductSoldDto(products.get(0), 18),
-                createProductSoldDto(products.get(1), 1),
-                createProductSoldDto(products.get(2), 5),
-                createProductSoldDto(products.get(3), 8)
-        );
-
-        var tomorrowDate = LocalDate.now().plusDays(1);
-
-        installmentsDto = List.of(
-                createInstallment(tomorrowDate.toString(), 120.90, "PIX", true)
-        );
-
-        customer = customerRepository.save(createCustomer());
-        saleDto = createSaleDto();
+    public SaleIT(ProductDataTest productData, CustomerDataTest customerData, ProductSoldDataTest productSoldData, InstallmentDataTest installmentData, SaleDataTest saleData) {
+        this.productData = productData.createProducts().saveProducts();
+        this.productSoldData = productSoldData.createProductsSold(productData.getProductsDto());
+        this.customerData = customerData.createCustomers().saveCustomers();
+        this.installmentData = installmentData.createInstallments();
+        this.saleData = saleData.createSales(productSoldData.getProductsSoldDto(), customerData.getCustomersDto(), installmentData.getInstallmentsDto());
     }
 
     @AfterEach
-    void cleanAll() {
-        productsMappedOriginal = new HashMap<>();
-        productsMappedUpdated = new HashMap<>();
-        productRepository.deleteAll();
-        customerRepository.deleteAll();
-        saleRepository.deleteAll();
+    void cleanDataBase() {
+        productData.cleanDataBase();
+        customerData.cleanDataBase();
+        saleData.cleanDataBase();
     }
 
     @Test
     public void saveSale_Success() {
-        var response = restTemplate.postForEntity(URI, saleDto, SaleDto.class);
+        saleData.saveSales();
 
-        var body = response.getBody();
-
-        Assertions.assertEquals(HttpStatus.CREATED, response.getStatusCode());
-
-        assertionsNotNullBodySale(body);
-        assertionsBodySale(body);
+        assertionsNotNullBodySaleList(saleData.getSalesDto());
+        assertionsBodySaleList(saleData.getSalesDto());
     }
 
     @Test
     public void getAllSales_Success() {
-        saleSaved = saveSaleDto();
+        saleData.saveSales();
 
-        var res = restTemplate.exchange(
-                URI,
-                HttpMethod.GET,
-                null,
-                new ParameterizedTypeReference<List<SaleDto>>() {}
-        );
+        ResponseEntity<List<SaleDto>> res = saleData.findAllSales();
 
         List<SaleDto> body = res.getBody();
 
@@ -120,39 +68,38 @@ public class SaleIT {
 
     @Test
     public void getSaleById_Success() {
-        saleSaved = saveSaleDto();
+        saleData.saveSales();
 
-        var res = restTemplate.getForEntity(
-                URI + "/" + saleSaved.id(),
-                SaleDto.class
-        );
-        var body = res.getBody();
+        for (SaleDto saleDto : saleData.getSalesDto()) {
+            ResponseEntity<SaleDto> res = saleData.findSaleById(saleDto);
 
-        Assertions.assertEquals(HttpStatus.OK, res.getStatusCode());
+            Assertions.assertEquals(HttpStatus.OK, res.getStatusCode());
+            var body = res.getBody();
 
-        assertionsNotNullBodySale(body);
-        assertionsBodySale(body);
+            assertionsNotNullBodySale(body);
+            assertionsBodySale(body);
+        }
     }
 
     @Test
     public void updateSale_Success() {
-        saleSaved = saveSaleDto();
+        saleData.saveSales();
+        SaleDto saleSaved = saleData.getSaleDto(0);
 
-        var productsSoldDtoForUpdate = List.of(
-                createProductSoldDto(products.get(0), 18),
-                createProductSoldDto(products.get(1), 3),
-                createProductSoldDto(products.get(3), 8),
-                createProductSoldDto(products.get(4), 1)
+        List<ProductSoldDto> productsSoldDtoForUpdate = List.of(
+            createProductSoldDto(productData.getProductDto(0), productData.getProductDto(0).stockQuantity() - 1),
+            createProductSoldDto(productData.getProductDto(1), productData.getProductDto(1).stockQuantity()),
+            createProductSoldDto(productData.getProductDto(3), productData.getProductDto(3).stockQuantity() - 1),
+            createProductSoldDto(productData.getProductDto(4), productData.getProductDto(4).stockQuantity())
         );
 
-        saleDto = createSaleDtoForUpdate(productsSoldDtoForUpdate);
-
-        var res =  restTemplate.exchange(
-                URI + "/" + saleSaved.id(),
-                HttpMethod.PUT,
-                new HttpEntity<SaleDto>(saleDto),
-                SaleDto.class
+        SaleDto saleDtoForUpdate = createSaleDtoForUpdate(
+            productsSoldDtoForUpdate,
+            customerData.getCustomerDto(0),
+            installmentData.getInstallmentsDto()
         );
+
+        ResponseEntity<SaleDto> res = saleData.updateSale(saleSaved.id(), saleDtoForUpdate);
 
         var body = res.getBody();
 
@@ -163,97 +110,117 @@ public class SaleIT {
         Assertions.assertEquals(saleSaved.createdAt(), body.createdAt());
         Assertions.assertEquals(productsSoldDtoForUpdate.size(), body.productsSold().size());
 
-        var productsUpdated = productRepository.findAll();
+        ResponseEntity<List<ProductDto>> productsUpdated = productData.findAllProducts();
+        Assertions.assertEquals(HttpStatus.OK, productsUpdated.getStatusCode());
+
+        HashMap<Long, ProductDto> productsMappedOriginal = new HashMap<>();
+        productData.getProductsDto().forEach(productDto -> {
+            productsMappedOriginal.put(productDto.id(), productDto);
+        });
+
         var productsSoldUpdated = body.productsSold();
 
-        for (Product product : productsMappedOriginal.values()) {
-            var productOriginal = productsMappedOriginal.get(product.getId());
-            var productUpdated = getProductUpdatedOn(product, productsUpdated);
-            var productSoldOriginal = getProductSoldOriginal(product);
-            var productSoldUpdated = getProductSoldUpdated(product, productsSoldUpdated);
+        for (ProductDto productDto : productsMappedOriginal.values()) {
+            ProductDto productDtoOriginal = productsMappedOriginal.get(productDto.id());
+            ProductDto productUpdated = getProductUpdatedOn(productDto, productsUpdated.getBody());
+            ProductSoldDto productSoldOriginal = getProductSoldOriginal(productDto);
+            ProductSoldDto productSoldUpdated = getProductSoldUpdated(productDto, productsSoldUpdated);
 
-            if(productSoldOriginal == null && productSoldUpdated == null) {
+            if (productSoldOriginal == null && productSoldUpdated == null) {
                 continue;
             }
 
-            if(productSoldOriginal != null) {
-                if(productSoldUpdated != null) {
-                    assertionsVerifyProductOriginalAndUpdated(productOriginal, productUpdated, productSoldUpdated);
+            if (productSoldOriginal != null) {
+                if (productSoldUpdated != null) {
+                    assertionsVerifyProductOriginalAndUpdated(productDtoOriginal, productUpdated, productSoldUpdated);
                     continue;
                 }
 
-                assertionsPresentOnOriginal(productOriginal, productUpdated);
+                assertionsPresentOnOriginal(productDtoOriginal, productUpdated);
                 continue;
             }
 
-            assertionsVerifyProductOriginalAndUpdated(productOriginal, productUpdated, productSoldUpdated);
+            assertionsVerifyProductOriginalAndUpdated(productDtoOriginal, productUpdated, productSoldUpdated);
         }
     }
 
     @Test
     public void deleteSale_Success() {
-        saleSaved = saveSaleDto();
+        saleData.saveSales();
 
-        var res = restTemplate.exchange(
-            URI + "/" + saleSaved.id(),
-                HttpMethod.DELETE,
-                null,
-                Void.class
-        );
-
-        var saleDeleted = saleRepository.findById(saleSaved.id()).orElse(null);
-        Assertions.assertNull(saleDeleted);
-
+        ResponseEntity<Void> res = saleData.deleteSale(saleData.getSaleDto(0));
         Assertions.assertEquals(HttpStatus.NO_CONTENT, res.getStatusCode());
 
-        for (ProductSoldDto productSoldDto : productsSoldDto) {
+        ResponseEntity<SaleDto> responseSaleDeleted = saleData.findSaleById(saleData.getSaleDto(0));
+        Assertions.assertEquals(HttpStatus.NOT_FOUND, responseSaleDeleted.getStatusCode());
+
+        for (ProductSoldDto productSoldDto : productSoldData.getProductsSoldDto()) {
+            Long productId = productSoldDto.productId();
+            ProductDto productOriginal = productData.getProductsDto().stream()
+                .filter(productDto -> Objects.equals(productId, productDto.id()))
+                .findFirst()
+                .orElse(null);
+
+            ResponseEntity<ProductDto> productUpdated = productData.findProductById(productId);
+            Assertions.assertEquals(HttpStatus.OK, productUpdated.getStatusCode());
+
+            assert productOriginal != null;
+            Assertions.assertEquals(productOriginal.stockQuantity(), productUpdated.getBody().stockQuantity());
+        }
+    }
+
+
+    private void assertionsBodySale(SaleDto body) {
+        ResponseEntity<List<ProductDto>> responseGetAllProducts = productData.findAllProducts();
+        Assertions.assertEquals(HttpStatus.OK, responseGetAllProducts.getStatusCode());
+
+        List<ProductDto> productsDto = responseGetAllProducts.getBody();
+        Assertions.assertNotNull(productsDto);
+
+        HashMap<Long, ProductDto> productsMappedUpdated = new HashMap<>();
+
+        instanceProductsMapped(productsMappedUpdated, productsDto);
+
+        assertionsProductSold(body, productsMappedUpdated);
+        assertionsInstallments(body);
+    }
+
+    private void assertionsBodySaleList(List<SaleDto> body) {
+        for (SaleDto saleBody : body) {
+            assertionsBodySale(saleBody);
+        }
+    }
+
+    private void instanceProductsMapped(HashMap<Long, ProductDto> productsMapped, List<ProductDto> productsDto) {
+        for (ProductDto productDto : productsDto) {
+            productsMapped.put(productDto.id(), productDto);
+        }
+    }
+
+    private void assertionsProductSold(SaleDto body, HashMap<Long, ProductDto> productsMappedUpdated) {
+        HashMap<Long, ProductDto> productsMappedOriginal = new HashMap<>();
+        productData.getProductsDto().forEach(productDto -> {
+            productsMappedOriginal.put(productDto.id(), productDto);
+        });
+
+        for (ProductSoldDto productSoldDto : body.productsSold()) {
             var productId = productSoldDto.productId();
-            var productOriginal = getProductById(productId);
-            var productUpdated = getProductUpdatedById(productId);
+            Assertions.assertNotNull(productId);
 
-            Assertions.assertEquals(productOriginal.getStockQuantity(), productUpdated.getStockQuantity());
+            var productOriginal = productsMappedOriginal.get(productId);
+            var productUpdated = productsMappedUpdated.get(productId);
+
+            var stockQuantityOriginal = productOriginal.stockQuantity();
+            var stockQuantityUpdated = productUpdated.stockQuantity();
+
+            Assertions.assertEquals(stockQuantityOriginal - productSoldDto.quantity(), stockQuantityUpdated);
         }
     }
 
-    private void instanceProductsMapped(HashMap<Long, Product> productsMapped, List<Product> products) {
-        for (Product product: products) {
-            productsMapped.put(product.getId(), product);
+    private void assertionsInstallments(SaleDto body) {
+        for (InstallmentDto installment : body.installments()) {
+            Assertions.assertNotNull(installment);
         }
-    }
-
-    private Product getProductUpdatedById(Long id) {
-        return productRepository.findById(id).orElse(null);
-    }
-
-    private Product getProductById(Long id) {
-        for (Product product : productsMappedOriginal.values()) {
-            if(Objects.equals(product.getId(), id))
-                return product;
-        }
-
-        return null;
-    }
-
-    private void assertionsPresentOnOriginal(
-            Product productOriginal,
-            Product productUpdated
-    ) {
-        Assertions.assertEquals(
-                productOriginal.getStockQuantity(),
-                productUpdated.getStockQuantity()
-        );
-    }
-
-    private void assertionsVerifyProductOriginalAndUpdated(
-            Product productOriginal,
-            Product productUpdated,
-            ProductSoldDto productSoldDtoUpdated
-
-    ) {
-        Assertions.assertEquals(
-                productOriginal.getStockQuantity() - productSoldDtoUpdated.quantity(),
-                productUpdated.getStockQuantity()
-        );
     }
 
     private void assertionsNotNullBodySale(SaleDto body) {
@@ -275,107 +242,64 @@ public class SaleIT {
         }
     }
 
-    private void assertionsBodySale(SaleDto body) {
-        var products = productRepository.findAll();
-        instanceProductsMapped(productsMappedUpdated, products);
-
-        assertionsProductSold(body);
-        assertionsInstallments(body);
+    private ProductSoldDto createProductSoldDto(ProductDto product, int quantity) {
+        return ProductSoldCreator.createProductSoldDto(product.id(), quantity);
     }
 
-    private void assertionsBodySaleList(List<SaleDto> body) {
-        for (SaleDto saleBody : body) {
-            assertionsBodySale(saleBody);
-        }
+    private SaleDto createSaleDtoForUpdate(List<ProductSoldDto> productsSoldDtoForUpdate, CustomerDto customerDto, List<InstallmentDto> installmentsDto) {
+        return SaleCreator.createSaleDto(customerDto, 1000.00, productsSoldDtoForUpdate, installmentsDto);
     }
 
-    private void assertionsProductSold(SaleDto body) {
-        for (ProductSoldDto productSoldDto : body.productsSold()) {
-            var productId = productSoldDto.productId();
-            Assertions.assertNotNull(productId);
-
-            var productOriginal = productsMappedOriginal.get(productId);
-            var productUpdated = productsMappedUpdated.get(productId);
-
-            var stockQuantityOriginal = productOriginal.getStockQuantity();
-            var stockQuantityUpdated = productUpdated.getStockQuantity();
-
-            Assertions.assertEquals(
-                    stockQuantityOriginal - productSoldDto.quantity(),
-                    stockQuantityUpdated
-            );
-        }
-    }
-
-    private void assertionsInstallments(SaleDto body) {
-        for (InstallmentDto installment : body.installments()) {
-            Assertions.assertNotNull(installment);
-        }
-
-    }
-
-    private SaleDto saveSaleDto() {
-        var res = restTemplate.postForEntity(URI, saleDto, SaleDto.class);
-        assert res.getBody() != null;
-        return res.getBody();
-    }
-
-    private Product createProduct(String name, double price, int stockQuantity) {
-        return ProductCreator.createModel(name, price, stockQuantity);
-    }
-
-    private ProductSoldDto createProductSoldDto(Product product, int quantity) {
-        return ProductSoldCreator.createDto(product.getId(), quantity);
-    }
-
-    private Customer createCustomer() {
-        return CustomerCreator.createModel(
-                "Carlos Henrique Lima", "440.052.520-10", "Irmão do Dr.", "Rua. Bairro.", null
-        );
-    }
-
-    private InstallmentDto createInstallment(String dueDate, double price, String paymentMethod, boolean isPaid) {
-        return InstallmentCreator.createDto(
-                dueDate, price, paymentMethod, isPaid
-        );
-    }
-
-    private SaleDto createSaleDto() {
-        return SaleCreator.createDto(CustomerMapper.toDto(customer), 123.00, productsSoldDto, installmentsDto);
-    }
-
-    private SaleDto createSaleDtoForUpdate(List<ProductSoldDto> productsSoldDtoForUpdate) {
-        return SaleCreator.createDto(CustomerMapper.toDto(customer), 1000.00, productsSoldDtoForUpdate, installmentsDto);
-    }
-
-    private Product getProductUpdatedOn(Product product, List<Product> productsUpdated) {
+    private ProductDto getProductUpdatedOn(ProductDto product, List<ProductDto> productsUpdated) {
         return getProductOn(product, productsUpdated);
     }
 
-    private Product getProductOn(Product productModel, List<Product> productsForIterate) {
-        for (Product product : productsForIterate) {
-            if(Objects.equals(product.getId(), productModel.getId()))
-                return product;
+    private ProductDto getProductOn(ProductDto productModel, List<ProductDto> productsForIterate) {
+        for (ProductDto productDto : productsForIterate) {
+            if (Objects.equals(productDto.id(), productModel.id()))
+                return productDto;
         }
 
         return null;
     }
 
-    private ProductSoldDto getProductSoldOriginal(Product product) {
-        return getProductSoldOn(product, productsSoldDto);
+    private ProductSoldDto getProductSoldOriginal(ProductDto productDto) {
+        return getProductSoldOn(productDto, productSoldData.getProductsSoldDto());
     }
 
-    private ProductSoldDto getProductSoldUpdated(Product product, List<ProductSoldDto> productsSoldDtoUpdated) {
-        return getProductSoldOn(product, productsSoldDtoUpdated);
-    }
-
-    private ProductSoldDto getProductSoldOn(Product product, List<ProductSoldDto> productsSoldDtoForIterate) {
-        for (ProductSoldDto productSoldDto : productsSoldDtoForIterate){
-            if(Objects.equals(productSoldDto.productId(), product.getId())) {
+    private ProductSoldDto getProductSoldOn(ProductDto productDto, List<ProductSoldDto> productsSoldDtoForIterate) {
+        for (ProductSoldDto productSoldDto : productsSoldDtoForIterate) {
+            if (Objects.equals(productSoldDto.productId(), productDto.id())) {
                 return productSoldDto;
             }
         }
 
         return null;
+    }
+
+    private ProductSoldDto getProductSoldUpdated(ProductDto productDto, List<ProductSoldDto> productsSoldDtoUpdated) {
+        return getProductSoldOn(productDto, productsSoldDtoUpdated);
+    }
+
+    private void assertionsVerifyProductOriginalAndUpdated(
+        ProductDto productDtoOriginal,
+        ProductDto productDtoUpdated,
+        ProductSoldDto productSoldDtoUpdated
+
+    ) {
+        Assertions.assertEquals(
+            productDtoOriginal.stockQuantity() - productSoldDtoUpdated.quantity(),
+            productDtoUpdated.stockQuantity()
+        );
+    }
+
+    private void assertionsPresentOnOriginal(
+        ProductDto productDtoOriginal,
+        ProductDto productDtoUpdated
+    ) {
+        Assertions.assertEquals(
+            productDtoOriginal.stockQuantity(),
+            productDtoUpdated.stockQuantity()
+        );
     }
 }

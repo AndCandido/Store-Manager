@@ -8,6 +8,8 @@ public enum SaleDtoFieldsValidator {
         @Override
         public boolean validate(SaleDto saleDto) {
             var installments = saleDto.installments();
+            if(installments == null) return true;
+
             double totalPriceInstallments = 0;
 
             for (InstallmentDto installment : installments) {

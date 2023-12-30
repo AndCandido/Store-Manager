@@ -86,6 +86,8 @@ public class SaleServiceImpl implements ISaleService {
     }
 
     private void handlerCustomer(Sale sale, SaleDto saleDto) {
+        if(saleDto.customer() == null) return;
+
         var customer = getCustomer(saleDto.customer());
 
         if(customer != null) {

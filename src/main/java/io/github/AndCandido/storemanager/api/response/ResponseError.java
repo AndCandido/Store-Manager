@@ -1,5 +1,7 @@
 package io.github.AndCandido.storemanager.api.response;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.http.HttpStatus;
 
@@ -38,5 +40,13 @@ public class ResponseError {
         this(List.of(error));
         this.status = httpStatus.value();
         this.errorType = httpStatus.name();
+    }
+
+    @JsonCreator
+    public ResponseError(List<String> errors, int status, String errorType, LocalDateTime timestamp) {
+        this.errors = errors;
+        this.status = status;
+        this.errorType = errorType;
+        this.timestamp = timestamp;
     }
 }

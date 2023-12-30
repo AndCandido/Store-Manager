@@ -3,7 +3,7 @@ package io.github.AndCandido.storemanager.domain.dtos;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.AndCandido.storemanager.domain.annotations.ValidateInstallmentDto;
 import io.github.AndCandido.storemanager.domain.annotations.enums.InstallmentDtoFieldsValidator;
-import io.github.AndCandido.storemanager.domain.dtos.groups.ToPatch;
+import io.github.AndCandido.storemanager.domain.dtos.groups.ToPatchGroup;
 import io.github.AndCandido.storemanager.domain.enums.PaymentMethod;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
@@ -31,10 +31,10 @@ public record InstallmentDto(
     @Min(value = 0, message = "{installment.field.price.min}")
     Double price,
 
-    @NotNull(message = "{installment.field.paymentMethod.null}", groups = ToPatch.class)
+    @NotNull(message = "{installment.field.paymentMethod.null}", groups = ToPatchGroup.class)
     PaymentMethod paymentMethod,
 
-    @NotNull(message = "{installment.field.isPaid.null}", groups = ToPatch.class)
+    @NotNull(message = "{installment.field.isPaid.null}", groups = ToPatchGroup.class)
     Boolean isPaid,
 
     @JsonInclude(JsonInclude.Include.NON_NULL)

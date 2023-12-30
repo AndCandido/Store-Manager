@@ -1,5 +1,6 @@
 package io.github.AndCandido.storemanager.web.advice;
 
+import io.github.AndCandido.storemanager.api.exceptions.AuthenticationClientException;
 import io.github.AndCandido.storemanager.api.exceptions.IllegalClientActionException;
 import io.github.AndCandido.storemanager.api.exceptions.InsufficientStockException;
 import io.github.AndCandido.storemanager.api.exceptions.ResourceNotFoundException;
@@ -58,6 +59,13 @@ public class HandlerExceptionsController {
     public ResponseEntity<ResponseError> handlerHttpMessageNotReadableException(HttpMessageNotReadableException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                 new ResponseError(e.getMessage())
+        );
+    }
+
+    @ExceptionHandler(AuthenticationClientException.class)
+    public ResponseEntity<ResponseError> handlerAuthenticationClientException(AuthenticationClientException e) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+            new ResponseError(e.getMessage())
         );
     }
 
