@@ -1,8 +1,10 @@
 package io.github.AndCandido.storemanager.domain.dtos;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import io.github.AndCandido.storemanager.domain.dtos.groups.RequestGroup;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Null;
 import lombok.Builder;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.br.CPF;
@@ -14,6 +16,7 @@ import java.util.UUID;
 @Builder
 public record CustomerDto(
 
+    @Null(message = "{field.id.null}", groups = RequestGroup.class)
    UUID id,
 
     @NotBlank(message = "{customer.field.name.blank}")
@@ -39,6 +42,7 @@ public record CustomerDto(
     @Valid
     List<InstallmentDto> installments,
 
+    @Null(message = "{field.createdAt.null}", groups = RequestGroup.class)
     LocalDateTime createdAt
 ) {
 }

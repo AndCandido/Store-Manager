@@ -2,14 +2,14 @@ package io.github.AndCandido.storemanager.web.controllers;
 
 
 import io.github.AndCandido.storemanager.domain.dtos.ProductDto;
+import io.github.AndCandido.storemanager.domain.dtos.groups.RequestGroup;
 import io.github.AndCandido.storemanager.domain.mappers.ProductMapper;
 import io.github.AndCandido.storemanager.domain.models.Product;
 import io.github.AndCandido.storemanager.domain.services.IProductService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -23,7 +23,9 @@ public class ProductController {
     private final IProductService productService;
 
     @PostMapping
-    public ResponseEntity<ProductDto> saveProduct(@RequestBody @Valid ProductDto productDto) {
+    public ResponseEntity<ProductDto> saveProduct(
+        @RequestBody @Validated(RequestGroup.class) ProductDto productDto
+    ) {
         Product productSaved = productService.saveProduct(productDto);
         var productResponse = ProductMapper.toDto(productSaved);
         return ResponseEntity.status(HttpStatus.CREATED).body(productResponse);
@@ -52,7 +54,7 @@ public class ProductController {
 
     @PutMapping("/{id}")
     public ResponseEntity<ProductDto> updateProduct(
-            @RequestBody @Valid ProductDto productDto, @PathVariable Long id
+            @RequestBody @Validated(RequestGroup.class) ProductDto productDto, @PathVariable Long id
     ) {
         Product product = productService.updateProduct(productDto, id);
         var productResponse = ProductMapper.toDto(product);

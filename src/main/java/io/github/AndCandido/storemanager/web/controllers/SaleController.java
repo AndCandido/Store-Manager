@@ -1,13 +1,14 @@
 package io.github.AndCandido.storemanager.web.controllers;
 
 import io.github.AndCandido.storemanager.domain.dtos.SaleDto;
+import io.github.AndCandido.storemanager.domain.dtos.groups.RequestGroup;
 import io.github.AndCandido.storemanager.domain.mappers.SaleMapper;
 import io.github.AndCandido.storemanager.domain.models.Sale;
 import io.github.AndCandido.storemanager.domain.services.ISaleService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -22,7 +23,9 @@ public class SaleController {
     private final ISaleService saleService;
 
     @PostMapping
-    public ResponseEntity<SaleDto> saveSale(@RequestBody @Valid SaleDto saleDto) {
+    public ResponseEntity<SaleDto> saveSale(
+        @RequestBody @Validated(RequestGroup.class) SaleDto saleDto
+    ) {
         Sale sale = saleService.saveSale(saleDto);
         var saleResDto = SaleMapper.toDto(sale);
         return ResponseEntity.status(HttpStatus.CREATED).body(saleResDto);
@@ -51,7 +54,7 @@ public class SaleController {
 
     @PutMapping("/{id}")
     public ResponseEntity<SaleDto> updateSale(
-            @RequestBody @Valid SaleDto saleDto,
+            @RequestBody @Validated(RequestGroup.class) SaleDto saleDto,
             @PathVariable UUID id
     ) {
         Sale sale = saleService.updateSale(saleDto, id);

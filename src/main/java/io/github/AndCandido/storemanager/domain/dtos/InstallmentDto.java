@@ -3,6 +3,7 @@ package io.github.AndCandido.storemanager.domain.dtos;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.AndCandido.storemanager.domain.annotations.ValidateInstallmentDto;
 import io.github.AndCandido.storemanager.domain.annotations.enums.InstallmentDtoFieldsValidator;
+import io.github.AndCandido.storemanager.domain.dtos.groups.RequestGroup;
 import io.github.AndCandido.storemanager.domain.dtos.groups.ToPatchGroup;
 import io.github.AndCandido.storemanager.domain.enums.PaymentMethod;
 import jakarta.validation.Valid;
@@ -21,6 +22,8 @@ import java.util.UUID;
     )
 })
 public record InstallmentDto(
+
+    @Null(message = "{field.id.null}", groups = RequestGroup.class)
     UUID id,
 
     @NotNull(message = "{installment.field.dueDate.null}")
@@ -45,6 +48,7 @@ public record InstallmentDto(
     @Valid
     SaleDto sale,
 
+    @Null(message = "{field.createdAt.null}", groups = RequestGroup.class)
     LocalDateTime createdAt
 ) {
 }

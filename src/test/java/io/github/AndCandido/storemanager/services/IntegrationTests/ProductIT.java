@@ -88,20 +88,18 @@ public class ProductIT {
         for (ProductDto productDto : productData.getProductsDto()) {
 
             var productDtoToUpdate = ProductDto.builder()
-                    .id(productDto.id())
                     .name("CHANGED " + productDto.name())
                     .price(productDto.price() + 10)
                     .stockQuantity(productDto.stockQuantity() + 5)
-                    .createdAt(productDto.createdAt())
                     .build();
 
-            ResponseEntity<ProductDto> response = productData.updateProduct(productDtoToUpdate);
+            ResponseEntity<ProductDto> response = productData.updateProduct(productDto.id(), productDtoToUpdate);
             Assertions.assertEquals(HttpStatus.CREATED, response.getStatusCode());
             ProductDto body = response.getBody();
 
             Assertions.assertNotNull(body);
-            Assertions.assertEquals(productDtoToUpdate.id(), body.id());
-            Assertions.assertEquals(productDtoToUpdate.createdAt(), body.createdAt());
+            Assertions.assertEquals(productDto.id(), body.id());
+            Assertions.assertEquals(productDto.createdAt(), body.createdAt());
             Assertions.assertEquals(productDtoToUpdate.name(), body.name());
             Assertions.assertEquals(productDtoToUpdate.price(), body.price());
             Assertions.assertEquals(productDtoToUpdate.stockQuantity(), body.stockQuantity());

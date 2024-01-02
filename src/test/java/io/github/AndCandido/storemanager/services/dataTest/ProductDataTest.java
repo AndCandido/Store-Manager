@@ -90,8 +90,8 @@ public class ProductDataTest {
         return restTemplate.getAll(PRODUCTS_URI, new ParameterizedTypeReference<List<ProductDto>>() {});
     }
 
-    public ResponseEntity<ProductDto> updateProduct(ProductDto productDtoToUpdate) {
-        return restTemplate.put(PRODUCTS_URI, productDtoToUpdate.id(), productDtoToUpdate, new ParameterizedTypeReference<>() {});
+    public ResponseEntity<ProductDto> updateProduct(Long id, ProductDto productDtoToUpdate) {
+        return restTemplate.put(PRODUCTS_URI, id, productDtoToUpdate, new ParameterizedTypeReference<>() {});
     }
 
     public ResponseEntity<ProductDto> findProduct(ProductDto productDto) {
