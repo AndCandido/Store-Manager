@@ -26,7 +26,8 @@ git clone https://github.com/AndCandido/store-manager.git
 
 # Para iniciar a aplicação
 ./mvnw spring-boot:run
-```
+````
+Assim o servidor estará disponível na porta ```8080```
 
 # Recursos da aplicação
 
