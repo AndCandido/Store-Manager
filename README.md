@@ -8,24 +8,27 @@ O projeto tem como finalidade gerenciar produtos, clientes e vendas de uma loja.
 
 ## Tecnologias utilizadas
 
-- Java
-- Spring Boot
-- Spring Data Jpa / Hibernate
-- Maven
+- Java.
+- Spring Boot.
+- Spring Data Jpa / Hibernate.
+- Maven.
 
 # Executar aplicação
 
 ## Requisitos
 
-- JDK 17
+- Java Developer Kit [(JDK 17)](https://www.oracle.com/java/technologies/downloads/#java17) instalado em sua máquina.
 
-## Execute
+## Execute em seu terminal
 ```Bash
-# Para clonar a aplicação em seu dispositivo
-git clone https://github.com/AndCandido/store-manager.git
+# Clone a aplicação
+git clone https://github.com/AndCandido/Store-Manager.git
 
-# Para iniciar a aplicação
-./mvnw spring-boot:run
+# Entrar na pasta do projeto
+cd Store-Manager
+
+# Execute a aplicação
+./mvnw clean spring-boot:run
 ````
 Assim o servidor estará disponível na porta ```8080```
 
