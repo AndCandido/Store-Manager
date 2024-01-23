@@ -15,7 +15,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class ProductSold {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue
     private UUID id;
 
     @ManyToOne

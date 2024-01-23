@@ -1,6 +1,7 @@
 package io.github.AndCandido.storemanager.web.controllers;
 
-import io.github.AndCandido.storemanager.domain.dtos.InstallmentDto;
+import io.github.AndCandido.storemanager.domain.dtos.requests.InstallmentRequestDto;
+import io.github.AndCandido.storemanager.domain.dtos.responses.InstallmentResponseDto;
 import io.github.AndCandido.storemanager.domain.dtos.groups.ToPatchGroup;
 import io.github.AndCandido.storemanager.domain.mappers.InstallmentMapper;
 import io.github.AndCandido.storemanager.domain.services.IInstallmentService;
@@ -18,9 +19,11 @@ public class InstallmentController {
     private final IInstallmentService installmentService;
 
     @PatchMapping("{id}")
-    public InstallmentDto patchInstallment(@RequestBody @Validated(ToPatchGroup.class) InstallmentDto installmentDto, @PathVariable UUID id) {
-        var installmentUpdated = installmentService.patchInstallment(installmentDto, id);
+    public InstallmentResponseDto patchInstallment(
+        @RequestBody @Validated(ToPatchGroup.class) InstallmentRequestDto installmentRequestDto,
+        @PathVariable UUID id)
+    {
+        var installmentUpdated = installmentService.patchInstallment(installmentRequestDto, id);
         return InstallmentMapper.toDto(installmentUpdated);
     }
-
 }

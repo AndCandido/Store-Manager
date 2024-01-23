@@ -1,17 +1,17 @@
 package io.github.AndCandido.storemanager.domain.mappers;
 
-import io.github.AndCandido.storemanager.domain.dtos.CustomerDto;
+import io.github.AndCandido.storemanager.domain.dtos.responses.CustomerResponseDto;
 import io.github.AndCandido.storemanager.domain.models.Customer;
 
 public class CustomerMapper {
 
-    public static CustomerDto toDto(Customer customer) {
+    public static CustomerResponseDto toDto(Customer customer) {
         if (customer == null) return null;
 
         var salesDto = SaleMapper.toDtoListWithoutAssociations(customer.getSales());
         var installmentsDto = InstallmentMapper.toDtoListWithoutAssociations(customer.getInstallments());
 
-        return CustomerDto.builder()
+        return CustomerResponseDto.builder()
                 .id(customer.getId())
                 .name(customer.getName())
                 .cpf( customer.getCpf())
@@ -24,9 +24,9 @@ public class CustomerMapper {
                 .build();
     }
 
-    public static CustomerDto toDtoWithoutAssociations(Customer customer) {
+    public static CustomerResponseDto toDtoWithoutAssociations(Customer customer) {
         return customer == null ? null
-                : CustomerDto.builder()
+                : CustomerResponseDto.builder()
                 .id(customer.getId())
                 .name(customer.getName())
                 .cpf( customer.getCpf())

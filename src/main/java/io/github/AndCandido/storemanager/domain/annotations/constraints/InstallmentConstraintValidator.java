@@ -2,11 +2,11 @@ package io.github.AndCandido.storemanager.domain.annotations.constraints;
 
 import io.github.AndCandido.storemanager.domain.annotations.ValidateInstallmentDto;
 import io.github.AndCandido.storemanager.domain.annotations.enums.InstallmentDtoFieldsValidator;
-import io.github.AndCandido.storemanager.domain.dtos.InstallmentDto;
+import io.github.AndCandido.storemanager.domain.dtos.requests.InstallmentRequestDto;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
-public class InstallmentConstraintValidator implements ConstraintValidator<ValidateInstallmentDto, InstallmentDto> {
+public class InstallmentConstraintValidator implements ConstraintValidator<ValidateInstallmentDto, InstallmentRequestDto> {
 
     private InstallmentDtoFieldsValidator validator;
 
@@ -16,7 +16,7 @@ public class InstallmentConstraintValidator implements ConstraintValidator<Valid
     }
 
     @Override
-    public boolean isValid(InstallmentDto installmentsDto, ConstraintValidatorContext constraintValidatorContext) {
+    public boolean isValid(InstallmentRequestDto installmentsDto, ConstraintValidatorContext constraintValidatorContext) {
         return validator.validate(installmentsDto);
     }
 }

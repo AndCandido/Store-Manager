@@ -1,11 +1,9 @@
 package io.github.AndCandido.storemanager.domain.services.impl;
 
 import io.github.AndCandido.storemanager.api.exceptions.ResourceNotFoundException;
-import io.github.AndCandido.storemanager.domain.dtos.CustomerDto;
-import io.github.AndCandido.storemanager.domain.dtos.InstallmentDto;
-import io.github.AndCandido.storemanager.domain.dtos.ProductSoldDto;
-import io.github.AndCandido.storemanager.domain.dtos.SaleDto;
-import io.github.AndCandido.storemanager.domain.models.Customer;
+import io.github.AndCandido.storemanager.domain.dtos.requests.InstallmentRequestDto;
+import io.github.AndCandido.storemanager.domain.dtos.requests.ProductSoldRequestDto;
+import io.github.AndCandido.storemanager.domain.dtos.requests.SaleRequestDto;
 import io.github.AndCandido.storemanager.domain.models.Installment;
 import io.github.AndCandido.storemanager.domain.models.ProductSold;
 import io.github.AndCandido.storemanager.domain.models.Sale;
@@ -30,13 +28,13 @@ public class SaleServiceImpl implements ISaleService {
 
     @Override
     @Transactional
-    public Sale saveSale(SaleDto saleDto) {
-        var sale = createSale(saleDto);
+    public Sale saveSale(SaleRequestDto saleRequestDto) {
+        var sale = createSale(saleRequestDto);
         sale = saleRepository.save(sale);
 
-        handlerCustomer(sale, saleDto);
-        handlerProductsSold(sale, saleDto);
-        handlerInstallments(sale, saleDto);
+        handlerCustomer(sale, saleRequestDto);
+        handlerProductsSold(sale, saleRequestDto);
+        handlerInstallments(sale, saleRequestDto);
 
         return sale;
     }
@@ -54,15 +52,15 @@ public class SaleServiceImpl implements ISaleService {
 
     @Override
     @Transactional
-    public Sale updateSale(SaleDto saleDto, UUID id) {
+    public Sale updateSale(SaleRequestDto saleRequestDto, UUID id) {
         var sale = getSaleById(id);
 
-        handlerCustomer(sale, saleDto);
+        handlerCustomer(sale, saleRequestDto);
 
         handlerReturnStockQuantityForProducts(sale);
 
-        handlerProductsSold(sale, saleDto);
-        handlerInstallments(sale, saleDto);
+        handlerProductsSold(sale, saleRequestDto);
+        handlerInstallments(sale, saleRequestDto);
 
         return saleRepository.save(sale);
     }
@@ -79,40 +77,38 @@ public class SaleServiceImpl implements ISaleService {
         saleRepository.delete(sale);
     }
 
-    private Sale createSale(SaleDto saleDto) {
+    private Sale createSale(SaleRequestDto saleResponseDto) {
         var sale = new Sale();
-        BeanUtils.copyProperties(saleDto, sale);
+        BeanUtils.copyProperties(saleResponseDto, sale);
         return sale;
     }
 
-    private void handlerCustomer(Sale sale, SaleDto saleDto) {
-        if(saleDto.customer() == null) return;
+    private void handlerCustomer(Sale sale, SaleRequestDto saleRequestDto) {
+        UUID customerId = saleRequestDto.customerId();
+        if(customerId == null) return;
 
-        var customer = getCustomer(saleDto.customer());
+        var customer = customerService.getCustomerById(customerId);
 
         if(customer != null) {
             sale.setCustomer(customer);
         }
     }
 
-    private void handlerProductsSold(Sale sale, SaleDto saleDto) {
-        for (ProductSoldDto productSoldDto : saleDto.productsSold()) {
-            var productSold = createProductSold(productSoldDto);
+    private void handlerProductsSold(Sale sale, SaleRequestDto saleRequestDto) {
+        for (ProductSoldRequestDto productSoldRequestDto : saleRequestDto.productsSold()) {
+            var productSold = productSoldService.createProductSold(productSoldRequestDto);
             productSold.setSale(sale);
             sale.getProductsSold().add(productSold);
         }
     }
 
-    private void handlerInstallments(Sale sale, SaleDto saleDto) {
-        double totalPrice = 0;
-        for (InstallmentDto installmentDto : saleDto.installments()) {
-            var installment = createInstallment(installmentDto);
+    private void handlerInstallments(Sale sale, SaleRequestDto saleRequestDto) {
+        for (InstallmentRequestDto installmentRequestDto : saleRequestDto.installments()) {
+            var installment = createInstallment(installmentRequestDto);
             installment.setCustomer(sale.getCustomer());
             installment.setSale(sale);
 
             sale.getInstallments().add(installment);
-
-            totalPrice += installmentDto.price();
         }
     }
 
@@ -124,15 +120,7 @@ public class SaleServiceImpl implements ISaleService {
         sale.getProductsSold().clear();
     }
 
-    private Customer getCustomer(CustomerDto customerDto) {
-        return customerService.getCustomerById(customerDto.id());
-    }
-
-    private ProductSold createProductSold(ProductSoldDto productSoldDto) {
-        return productSoldService.createProductSold(productSoldDto);
-    }
-
-    private Installment createInstallment(InstallmentDto installmentDto) {
-        return installmentService.createInstallment(installmentDto);
+    private Installment createInstallment(InstallmentRequestDto installmentRequestDto) {
+        return installmentService.createInstallment(installmentRequestDto);
     }
 }

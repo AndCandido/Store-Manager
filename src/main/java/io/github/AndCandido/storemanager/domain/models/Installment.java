@@ -20,7 +20,7 @@ import java.util.UUID;
 public class Installment {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue
     private UUID id;
 
     @Column(nullable = false)

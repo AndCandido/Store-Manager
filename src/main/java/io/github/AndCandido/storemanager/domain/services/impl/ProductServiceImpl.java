@@ -1,9 +1,9 @@
 package io.github.AndCandido.storemanager.domain.services.impl;
 
 import io.github.AndCandido.storemanager.api.exceptions.InsufficientStockException;
+import io.github.AndCandido.storemanager.domain.dtos.requests.ProductRequestDto;
 import io.github.AndCandido.storemanager.domain.models.ProductSold;
 import io.github.AndCandido.storemanager.domain.services.IProductService;
-import io.github.AndCandido.storemanager.domain.dtos.ProductDto;
 import io.github.AndCandido.storemanager.api.exceptions.ResourceNotFoundException;
 import io.github.AndCandido.storemanager.domain.models.Product;
 import io.github.AndCandido.storemanager.domain.repositories.IProductRepository;
@@ -21,9 +21,9 @@ public class ProductServiceImpl implements IProductService {
     private final IProductRepository productRepository;
 
     @Override
-    public Product saveProduct(ProductDto productDto) {
+    public Product saveProduct(ProductRequestDto productRequestDto) {
         Product product = new Product();
-        BeanUtils.copyProperties(productDto, product);
+        BeanUtils.copyProperties(productRequestDto, product);
 
         return productRepository.save(product);
     }
@@ -34,10 +34,10 @@ public class ProductServiceImpl implements IProductService {
     }
 
     @Override
-    public Product updateProduct(ProductDto productDto, Long id) {
+    public Product updateProduct(ProductRequestDto productRequestDto, Long id) {
         Product productFound = getProductById(id);
 
-        ApplicationUtil.copyNonNullProperties(productDto, productFound);
+        ApplicationUtil.copyNonNullProperties(productRequestDto, productFound);
 
         return productRepository.save(productFound);
     }

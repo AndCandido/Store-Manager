@@ -2,11 +2,11 @@ package io.github.AndCandido.storemanager.domain.annotations.constraints;
 
 import io.github.AndCandido.storemanager.domain.annotations.ValidateSaleDto;
 import io.github.AndCandido.storemanager.domain.annotations.enums.SaleDtoFieldsValidator;
-import io.github.AndCandido.storemanager.domain.dtos.SaleDto;
+import io.github.AndCandido.storemanager.domain.dtos.requests.SaleRequestDto;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
-public class SaleConstraintValidator implements ConstraintValidator<ValidateSaleDto, SaleDto> {
+public class SaleConstraintValidator implements ConstraintValidator<ValidateSaleDto, SaleRequestDto> {
     private SaleDtoFieldsValidator validator;
 
     @Override
@@ -15,7 +15,7 @@ public class SaleConstraintValidator implements ConstraintValidator<ValidateSale
     }
 
     @Override
-    public boolean isValid(SaleDto saleDto, ConstraintValidatorContext constraintValidatorContext) {
-        return validator.validate(saleDto);
+    public boolean isValid(SaleRequestDto saleRequestDto, ConstraintValidatorContext constraintValidatorContext) {
+        return validator.validate(saleRequestDto);
     }
 }

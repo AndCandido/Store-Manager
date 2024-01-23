@@ -1,10 +1,11 @@
 package io.github.AndCandido.storemanager.services.dataTest;
 
-import io.github.AndCandido.storemanager.domain.dtos.ProductDto;
-import io.github.AndCandido.storemanager.domain.dtos.ProductSoldDto;
+import io.github.AndCandido.storemanager.domain.dtos.requests.ProductSoldRequestDto;
+import io.github.AndCandido.storemanager.domain.dtos.responses.ProductResponseDto;
+import io.github.AndCandido.storemanager.domain.dtos.responses.ProductSoldResponseDto;
 import io.github.AndCandido.storemanager.domain.mappers.ProductSoldMapper;
 import io.github.AndCandido.storemanager.domain.repositories.IProductSoldRepository;
-import static io.github.AndCandido.storemanager.services.creators.ProductSoldCreator.*;
+import io.github.AndCandido.storemanager.services.creators.ProductSoldCreator;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.stereotype.Component;
@@ -15,35 +16,33 @@ import java.util.List;
 public class ProductSoldDataTest {
 
     @Getter
-    @Setter
-    private List<ProductSoldDto> productsSoldDto;
+    private List<ProductSoldRequestDto> productsSoldRequestDto;
+    @Getter@Setter
+    private List<ProductSoldResponseDto> productsSoldSaved;
     private final IProductSoldRepository productSoldRepository;
 
     public ProductSoldDataTest(IProductSoldRepository productSoldRepository) {
         this.productSoldRepository = productSoldRepository;
     }
 
-    public ProductSoldDataTest createProductsSold(List<ProductDto> productsDto) {
-        productsSoldDto = List.of(
-            createProductSoldDto(productsDto.get(0).id(), 4),
-            createProductSoldDto(productsDto.get(1).id(), 1),
-            createProductSoldDto(productsDto.get(2).id(), 4)
+    public ProductSoldDataTest createRequestProductsSold(List<ProductResponseDto> productsResponseDto) {
+        productsSoldRequestDto = List.of(
+            ProductSoldCreator.createProductSoldRequestDto(productsResponseDto.get(0).id(), 4),
+            ProductSoldCreator.createProductSoldRequestDto(productsResponseDto.get(1).id(), 1),
+            ProductSoldCreator.createProductSoldRequestDto(productsResponseDto.get(2).id(), 4)
         );
 
         return this;
     }
 
-    public ProductSoldDto findProductSold(ProductSoldDto productSoldDto) {
-        var productSold = productSoldRepository.findById(productSoldDto.id()).orElse(null);
-        assert productSold != null;
-        return ProductSoldMapper.toDto(productSold);
+    public ProductSoldRequestDto getProductSoldDto(int index) {
+        return productsSoldRequestDto.get(index);
     }
-
-    public ProductSoldDto getProductSoldDto(int i) {
-        return productsSoldDto.get(i);
+    public ProductSoldResponseDto getProductSoldSaved(int index) {
+        return productsSoldSaved.get(index);
     }
 
     public void refreshData() {
-        productsSoldDto = productSoldRepository.findAll().stream().map(ProductSoldMapper::toDto).toList();
+        productsSoldRequestDto = productSoldRepository.findAll().stream().map(ProductSoldMapper::toRequestDto).toList();
     }
 }

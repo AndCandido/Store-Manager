@@ -1,7 +1,8 @@
 package io.github.AndCandido.storemanager.domain.services.impl;
 
 import io.github.AndCandido.storemanager.api.exceptions.ResourceNotFoundException;
-import io.github.AndCandido.storemanager.domain.dtos.ProductSoldDto;
+import io.github.AndCandido.storemanager.domain.dtos.requests.ProductSoldRequestDto;
+import io.github.AndCandido.storemanager.domain.dtos.responses.ProductSoldResponseDto;
 import io.github.AndCandido.storemanager.domain.models.ProductSold;
 import io.github.AndCandido.storemanager.domain.repositories.IProductSoldRepository;
 import io.github.AndCandido.storemanager.domain.services.IProductService;
@@ -19,9 +20,9 @@ public class ProductSoldServiceImpl implements IProductSoldService {
     private final IProductService productService;
 
     @Override
-    public ProductSold createProductSold(ProductSoldDto productSoldDto) {
-        var product = productService.getProductById(productSoldDto.productId());
-        var quantitySold = productSoldDto.quantity();
+    public ProductSold createProductSold(ProductSoldRequestDto productSoldRequestDto) {
+        var product = productService.getProductById(productSoldRequestDto.productId());
+        var quantitySold = productSoldRequestDto.quantity();
 
         productService.updatedStockQuantityByProductSold(product, quantitySold);
 

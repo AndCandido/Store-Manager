@@ -1,6 +1,6 @@
 package io.github.AndCandido.storemanager.web.controllers;
 
-import io.github.AndCandido.storemanager.domain.dtos.UserDto;
+import io.github.AndCandido.storemanager.domain.dtos.requests.UserRequestDto;
 import io.github.AndCandido.storemanager.domain.services.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,8 +19,8 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public ResponseEntity saveUser(@RequestBody @Valid UserDto userDto) {
-        userService.saveUser(userDto);
+    public ResponseEntity saveUser(@RequestBody @Valid UserRequestDto userRequestDto) {
+        userService.saveUser(userRequestDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }

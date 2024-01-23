@@ -1,6 +1,6 @@
 package io.github.AndCandido.storemanager.domain.services;
 
-import io.github.AndCandido.storemanager.domain.dtos.CustomerDto;
+import io.github.AndCandido.storemanager.domain.dtos.requests.CustomerRequestDto;
 import io.github.AndCandido.storemanager.domain.models.Customer;
 
 import java.util.List;
@@ -8,13 +8,13 @@ import java.util.UUID;
 
 public interface ICustomerService {
 
-    Customer saveCustomer(CustomerDto customerDto);
+    Customer saveCustomer(CustomerRequestDto customerRequestDto);
 
     List<Customer> getAllCustomers();
 
     Customer getCustomerById(UUID id);
 
-    Customer updateCustomer(CustomerDto customerDto, UUID id);
+    Customer updateCustomer(CustomerRequestDto customerRequestDto, UUID id);
 
     void deleteCustomer(UUID id);
 

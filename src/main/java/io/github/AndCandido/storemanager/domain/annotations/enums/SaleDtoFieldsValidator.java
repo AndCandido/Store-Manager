@@ -1,39 +1,37 @@
 package io.github.AndCandido.storemanager.domain.annotations.enums;
 
-import io.github.AndCandido.storemanager.domain.dtos.InstallmentDto;
-import io.github.AndCandido.storemanager.domain.dtos.SaleDto;
+import io.github.AndCandido.storemanager.domain.dtos.requests.InstallmentRequestDto;
+import io.github.AndCandido.storemanager.domain.dtos.requests.SaleRequestDto;
 
 public enum SaleDtoFieldsValidator {
     INSTALLMENTS_PRICE_LESS_THAN_SALE_PRICE {
         @Override
-        public boolean validate(SaleDto saleDto) {
-            var installments = saleDto.installments();
+        public boolean validate(SaleRequestDto saleRequestDto) {
+            var installments = saleRequestDto.installments();
             if(installments == null) return true;
 
             double totalPriceInstallments = 0;
 
-            for (InstallmentDto installment : installments) {
+            for (InstallmentRequestDto installment : installments) {
                 totalPriceInstallments += installment.price();
             }
 
-            return totalPriceInstallments <= saleDto.price();
+            return totalPriceInstallments <= saleRequestDto.price();
         }
     },
 
     NO_HAVE_CUSTOMER_MUST_BE_ONLY_ONE_INSTALLMENT_PAID {
         @Override
-        public boolean validate(SaleDto saleDto) {
-            if(saleDto.customer() != null)
+        public boolean validate(SaleRequestDto saleRequestDto) {
+            if(saleRequestDto.customerId() != null)
                 return true;
 
-            boolean haveOnlyOneInstallment = saleDto.installments().size() == 1;
-            boolean isPaid = saleDto.installments().get(0).isPaid();
+            boolean haveOnlyOneInstallment = saleRequestDto.installments().size() == 1;
+            boolean isPaid = saleRequestDto.installments().get(0).isPaid();
 
             return haveOnlyOneInstallment && isPaid;
         }
     };
 
-    public boolean validate(SaleDto saleDto) {
-        return false;
-    }
+    public abstract boolean validate(SaleRequestDto saleRequestDto);
 }

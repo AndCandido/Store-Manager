@@ -1,11 +1,11 @@
 package io.github.AndCandido.storemanager.services.creators;
 
-import io.github.AndCandido.storemanager.domain.dtos.CustomerDto;
+import io.github.AndCandido.storemanager.domain.dtos.requests.CustomerRequestDto;
 
 public class CustomerCreator {
 
-    public static CustomerDto createCustomerDto(String name, String cpf, String nickname, String address, String phone) {
-        return CustomerDto.builder()
+    public static CustomerRequestDto createCustomerRequestDto(String name, String cpf, String nickname, String address, String phone) {
+        return CustomerRequestDto.builder()
                 .name(name)
                 .cpf(cpf)
                 .nickname(nickname)
