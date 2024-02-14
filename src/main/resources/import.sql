@@ -1,0 +1,2 @@
+INSERT INTO TB_PRODUCTS (ID, NAME, PRICE , STOCK_QUANTITY, CREATED_AT) VALUES (1, 'Calça Masc', 149.99, 5, now()), (2, 'Bermuda Juv', 70, 10, now()), (3, 'Saia Jeans', 110.05, 1, now()), (4, 'Carrinho de Brinquedo', 19.90, 15, now()), (5, 'Toalha', 22.5, 25, now());
+INSERT INTO TB_CUSTOMERS (ID, NAME, NICKNAME, CPF, ADDRESS, PHONE, CREATED_AT) VALUES (random_uuid(), 'Alberto Lima Castro', NULL, '021.419.780-84', 'Rua. Av. Bairro Santarém', NULL, now())
