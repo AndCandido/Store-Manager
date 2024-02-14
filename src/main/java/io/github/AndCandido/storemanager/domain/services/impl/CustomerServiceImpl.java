@@ -1,10 +1,12 @@
 package io.github.AndCandido.storemanager.domain.services.impl;
 
 import io.github.AndCandido.storemanager.domain.dtos.requests.CustomerRequestDto;
+import io.github.AndCandido.storemanager.domain.models.Installment;
 import io.github.AndCandido.storemanager.domain.services.ICustomerService;
 import io.github.AndCandido.storemanager.api.exceptions.ResourceNotFoundException;
 import io.github.AndCandido.storemanager.domain.models.Customer;
 import io.github.AndCandido.storemanager.domain.repositories.ICustomerRepository;
+import io.github.AndCandido.storemanager.domain.services.IInstallmentService;
 import io.github.AndCandido.storemanager.utils.ApplicationUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
@@ -18,6 +20,7 @@ import java.util.UUID;
 public class CustomerServiceImpl implements ICustomerService {
 
     private final ICustomerRepository customerRepository;
+    private final IInstallmentService installmentService;
 
     @Override
     public Customer saveCustomer(CustomerRequestDto customerRequestDto) {
@@ -44,6 +47,17 @@ public class CustomerServiceImpl implements ICustomerService {
     public void deleteCustomer(UUID id) {
         Customer customer = getCustomerById(id);
         customerRepository.delete(customer);
+    }
+
+    @Override
+    public List<Installment> getCustomerInstallments(UUID customerId, boolean isInstallmentsNonPaid) {
+        Customer customer = getCustomerById(customerId);
+
+        if(isInstallmentsNonPaid) {
+            return installmentService.getInstallmentsByCustomerNonPaid(customer);
+        }
+
+        return installmentService.getInstallmentsByCustomer(customer);
     }
 
     @Override

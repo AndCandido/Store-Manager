@@ -87,6 +87,8 @@ Customer {
 
 ```GET /customers``` -> Listar todos os clientes<br/>
 ```GET /customers/{id}``` -> Retorna o cliente específico pelo ID<br/>
+```GET /customers/{id}/installments``` -> Retorna todas as parcelas do cliente<br/>
+```GET /customers/{id}/installments?nonPaid=true``` -> Retorna todas as parcelas não pagas do cliente<br/>
 ```POST /customers``` -> Salva um cliente<br/>
 ```PUT /customers/{id}``` -> Atualiza um cliente específico pelo ID<br/>
 ```DELETE /customers/{id}``` -> Deleta um cliente <br/>

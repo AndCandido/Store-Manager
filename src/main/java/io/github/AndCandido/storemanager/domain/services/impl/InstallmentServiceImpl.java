@@ -2,8 +2,8 @@ package io.github.AndCandido.storemanager.domain.services.impl;
 
 import io.github.AndCandido.storemanager.api.exceptions.ResourceNotFoundException;
 import io.github.AndCandido.storemanager.domain.dtos.requests.InstallmentRequestDto;
-import io.github.AndCandido.storemanager.domain.dtos.responses.InstallmentResponseDto;
 import io.github.AndCandido.storemanager.domain.mappers.InstallmentMapper;
+import io.github.AndCandido.storemanager.domain.models.Customer;
 import io.github.AndCandido.storemanager.domain.models.Installment;
 import io.github.AndCandido.storemanager.domain.repositories.IInstallmentRepository;
 import io.github.AndCandido.storemanager.domain.services.IInstallmentService;
@@ -11,6 +11,7 @@ import io.github.AndCandido.storemanager.utils.ApplicationUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -37,6 +38,17 @@ public class InstallmentServiceImpl implements IInstallmentService {
         ApplicationUtil.copyNonNullProperties(installmentRequestDto, installmentExisting);
 
         return saveInstallment(installmentExisting);
+    }
+
+    @Override
+    public List<Installment> getInstallmentsByCustomerNonPaid(Customer customer) {
+        return installmentRepository.findByCustomerAndIsPaidFalse(customer);
+    }
+
+
+    @Override
+    public List<Installment> getInstallmentsByCustomer(Customer customer) {
+        return installmentRepository.findByCustomer(customer);
     }
 
     @Override

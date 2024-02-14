@@ -2,8 +2,11 @@ package io.github.AndCandido.storemanager.web.controllers;
 
 import io.github.AndCandido.storemanager.domain.dtos.requests.CustomerRequestDto;
 import io.github.AndCandido.storemanager.domain.dtos.responses.CustomerResponseDto;
+import io.github.AndCandido.storemanager.domain.dtos.responses.InstallmentResponseDto;
 import io.github.AndCandido.storemanager.domain.mappers.CustomerMapper;
+import io.github.AndCandido.storemanager.domain.mappers.InstallmentMapper;
 import io.github.AndCandido.storemanager.domain.models.Customer;
+import io.github.AndCandido.storemanager.domain.models.Installment;
 import io.github.AndCandido.storemanager.domain.services.ICustomerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -52,6 +55,20 @@ public class CustomerController {
        Customer customer = customerService.getCustomerById(id);
        var customerResDto = CustomerMapper.toDto(customer);
        return ResponseEntity.ok(customerResDto);
+    }
+
+    @GetMapping("/{id}/installments")
+    public ResponseEntity<List<InstallmentResponseDto>> getCustomerInstallments(
+        @PathVariable UUID id,
+        @RequestParam(value = "nonPaid", required = false, defaultValue = "false") boolean isInstallmentsNonPaid
+    ) {
+        List<Installment> customerInstallments =
+            customerService.getCustomerInstallments(id, isInstallmentsNonPaid);
+
+        List<InstallmentResponseDto> customerInstallmentsResponse =
+            InstallmentMapper.toDtoListWithoutAssociations(customerInstallments);
+
+        return ResponseEntity.ok(customerInstallmentsResponse);
     }
 
     @PutMapping("/{id}")

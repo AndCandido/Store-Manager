@@ -2,6 +2,7 @@ package io.github.AndCandido.storemanager.domain.services;
 
 import io.github.AndCandido.storemanager.domain.dtos.requests.CustomerRequestDto;
 import io.github.AndCandido.storemanager.domain.models.Customer;
+import io.github.AndCandido.storemanager.domain.models.Installment;
 
 import java.util.List;
 import java.util.UUID;
@@ -19,4 +20,6 @@ public interface ICustomerService {
     void deleteCustomer(UUID id);
 
     boolean customerExists(UUID id);
+
+    List<Installment> getCustomerInstallments(UUID customerId, boolean isInstallmentsNonPaid);
 }
