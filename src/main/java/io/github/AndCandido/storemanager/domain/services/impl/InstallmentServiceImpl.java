@@ -2,6 +2,10 @@ package io.github.AndCandido.storemanager.domain.services.impl;
 
 import io.github.AndCandido.storemanager.api.exceptions.ResourceNotFoundException;
 import io.github.AndCandido.storemanager.domain.dtos.requests.InstallmentRequestDto;
+<<<<<<< Updated upstream
+=======
+import io.github.AndCandido.storemanager.domain.dtos.requests.PaymentInstallment;
+>>>>>>> Stashed changes
 import io.github.AndCandido.storemanager.domain.mappers.InstallmentMapper;
 import io.github.AndCandido.storemanager.domain.models.Customer;
 import io.github.AndCandido.storemanager.domain.models.Installment;
@@ -26,17 +30,22 @@ public class InstallmentServiceImpl implements IInstallmentService {
     }
 
     @Override
-    public Installment findById(UUID id) {
+    public Installment getInstallmentById(UUID id) {
         return installmentRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Parcela não encontrada"));
     }
 
     @Override
-    public Installment patchInstallment(InstallmentRequestDto installmentRequestDto, UUID id) {
-        var installmentExisting = findById(id);
+    public Installment updateInstallment(UUID id, InstallmentRequestDto installmentRequestDto) {
+        Installment installmentSaved = getInstallmentById(id);
+        ApplicationUtil.copyNonNullProperties(installmentRequestDto, installmentSaved);
+        return installmentRepository.save(installmentSaved);
+    }
 
-        ApplicationUtil.copyNonNullProperties(installmentRequestDto, installmentExisting);
-
+    @Override
+    public Installment setPaymentInstallment(PaymentInstallment paymentInstallment, UUID id) {
+        Installment installmentExisting = getInstallmentById(id);
+        ApplicationUtil.copyNonNullProperties(paymentInstallment, installmentExisting);
         return saveInstallment(installmentExisting);
     }
 

@@ -9,8 +9,7 @@ public enum PaymentMethod {
     DEBIT_CARD("debit card"),
     CREDIT_CARD("credit card"),
     PIX("pix"),
-    NEGOTIATED("negotiated"),
-    NONE("none");
+    NEGOTIATED("negotiated");
 
     private String value;
 

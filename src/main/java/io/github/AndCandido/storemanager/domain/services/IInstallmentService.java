@@ -1,6 +1,10 @@
 package io.github.AndCandido.storemanager.domain.services;
 
 import io.github.AndCandido.storemanager.domain.dtos.requests.InstallmentRequestDto;
+<<<<<<< Updated upstream
+=======
+import io.github.AndCandido.storemanager.domain.dtos.requests.PaymentInstallment;
+>>>>>>> Stashed changes
 import io.github.AndCandido.storemanager.domain.models.Customer;
 import io.github.AndCandido.storemanager.domain.models.Installment;
 
@@ -11,9 +15,11 @@ public interface IInstallmentService {
 
     Installment saveInstallment(Installment installment);
 
-    Installment findById(UUID id);
+    Installment getInstallmentById(UUID id);
 
-    Installment patchInstallment(InstallmentRequestDto installmentRequestDto, UUID id);
+    Installment updateInstallment(UUID id, InstallmentRequestDto installmentRequestDto);
+
+    Installment setPaymentInstallment(PaymentInstallment paymentInstallment, UUID id);
 
     Installment createInstallment(InstallmentRequestDto installmentRequestDto);
 

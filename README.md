@@ -142,8 +142,8 @@ Installment {
 
 ```id: UUID```
 
-```PATCH /installments/{id}``` -> Atualiza um campo específica de uma parcela pelo ID<br/>
-Nota: Rota pensada para atualizar o campo ```isPaid``` de uma parcela, quando uma parcela for paga.
+```PUT /installments/{id}``` -> Atualiza uma parcela pelo ID
+```PATCH /installments/payment/{id}``` -> Atualiza os campos relacionados ao pagamento de uma parcela pelo ID, recebendo no corpo da requisição um objeto do tipo ```PaymentInstallment```<br/>
 
 ## Produto Vendido
 
@@ -165,6 +165,14 @@ PaymentMethod {
   "credit card"
   "pix"
   "negotiated"
-  "none"
+}
+```
+
+## PaymentInstallment
+
+```
+PaymentInstallment {
+    isPaid:          boolean         required
+    paymentMethod:   PaymentMethod   required
 }
 ```
