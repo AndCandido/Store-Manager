@@ -2,10 +2,7 @@ package io.github.AndCandido.storemanager.domain.services.impl;
 
 import io.github.AndCandido.storemanager.api.exceptions.ResourceNotFoundException;
 import io.github.AndCandido.storemanager.domain.dtos.requests.InstallmentRequestDto;
-<<<<<<< Updated upstream
-=======
 import io.github.AndCandido.storemanager.domain.dtos.requests.PaymentInstallment;
->>>>>>> Stashed changes
 import io.github.AndCandido.storemanager.domain.mappers.InstallmentMapper;
 import io.github.AndCandido.storemanager.domain.models.Customer;
 import io.github.AndCandido.storemanager.domain.models.Installment;

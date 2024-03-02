@@ -32,41 +32,19 @@ public class HandlerExceptionsController {
         );
     }
 
-    @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ResponseError> handlerProductNotFoundException(
-            ResourceNotFoundException e
+    @ExceptionHandler(value = {
+        ResourceNotFoundException.class,
+        InsufficientStockException.class,
+        IllegalClientActionException.class,
+        HttpMessageNotReadableException.class,
+        AuthenticationClientException.class
+
+    })
+    public ResponseEntity<ResponseError> handlerExceptions(
+            RuntimeException e
     ) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
                 new ResponseError(e.getMessage())
         );
     }
-
-    @ExceptionHandler(InsufficientStockException.class)
-    public ResponseEntity<ResponseError> handlerInsufficientStockException(InsufficientStockException e) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                new ResponseError(e.getMessage())
-        );
-    }
-
-    @ExceptionHandler(IllegalClientActionException.class)
-    public ResponseEntity<ResponseError> handlerIllegalSaleException(IllegalClientActionException e) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                new ResponseError(e.getMessage())
-        );
-    }
-
-    @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<ResponseError> handlerHttpMessageNotReadableException(HttpMessageNotReadableException e) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                new ResponseError(e.getMessage())
-        );
-    }
-
-    @ExceptionHandler(AuthenticationClientException.class)
-    public ResponseEntity<ResponseError> handlerAuthenticationClientException(AuthenticationClientException e) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
-            new ResponseError(e.getMessage())
-        );
-    }
-
 }
