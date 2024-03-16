@@ -12,6 +12,7 @@ public class ProductMapper {
 
         return ProductResponseDto.builder()
                 .id(product.getId())
+                .ref(product.getRef())
                 .name(product.getName())
                 .productsSold(productsSoldDto)
                 .price(product.getPrice())

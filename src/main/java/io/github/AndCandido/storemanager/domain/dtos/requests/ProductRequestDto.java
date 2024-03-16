@@ -16,6 +16,10 @@ public record ProductRequestDto(
     @Length(max = 50, message = "{product.field.name.max}")
     String name,
 
+    @NotNull(message = "{product.field.ref.null}")
+    @Min(value = 0, message = "{product.field.ref.min}")
+    Long ref,
+
     @Valid
     List<ProductSoldRequestDto> productsSold,
 

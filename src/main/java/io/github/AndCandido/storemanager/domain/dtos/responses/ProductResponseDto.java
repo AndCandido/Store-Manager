@@ -10,6 +10,8 @@ public record ProductResponseDto(
 
     Long id,
 
+    Long ref,
+
     String name,
 
     List<ProductSoldResponseDto> productsSold,
