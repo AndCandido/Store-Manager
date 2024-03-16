@@ -35,24 +35,17 @@ Assim o servidor estará disponível na porta ```8080```
 # Recursos da aplicação
 
 ## Produtos
-
-### Objeto
-
 ```
-
 Product {
   id:            num
   name:          string          Required
+  ref:           num             Required
   productsSold:  ProductSold[]
   price:         num             Required
   stockQuantity: num             Required
   createdAt:     Date  
 } 
-
 ```
-
-### Rotas
-
 ```id: num```
 
 ```GET /products``` -> Listar todos os produtos<br/>
@@ -62,9 +55,6 @@ Product {
 ```DELETE /products/{id}``` -> Deleta um produto <br/>
 
 ## Clientes
-
-### Objeto
-
 ```
 
 Customer {
@@ -81,8 +71,6 @@ Customer {
 
 ```
 
-### Rotas
-
 ```id: UUID```
 
 ```GET /customers``` -> Listar todos os clientes<br/>
@@ -94,11 +82,7 @@ Customer {
 ```DELETE /customers/{id}``` -> Deleta um cliente <br/>
 
 ## Vendas
-
-### Objeto
-
 ```
-
 Sale {
   id:            UUID
   customer:      Customer
@@ -110,7 +94,6 @@ Sale {
 
 ```
 
-### Rotas
 
 ```id: UUID```
 
@@ -121,9 +104,6 @@ Sale {
 ```DELETE /sales/{id}``` -> Deleta uma venda <br/>
 
 ## Parcelas
-
-### Objeto
-
 ```
 Installment {
   id:             UUID
@@ -138,7 +118,6 @@ Installment {
 
 ```
 
-### Rotas
 
 ```id: UUID```
 
@@ -146,8 +125,6 @@ Installment {
 ```PATCH /installments/payment/{id}``` -> Atualiza os campos relacionados ao pagamento de uma parcela pelo ID, recebendo no corpo da requisição um objeto do tipo ```PaymentInstallment```<br/>
 
 ## Produto Vendido
-
-### Objeto
 ```
 ProductSold {
   id:          UUID
@@ -157,7 +134,6 @@ ProductSold {
 ```
 
 ## Método de Pagamento (ENUM)
- 
 ```
 PaymentMethod {
   "money"
@@ -169,7 +145,6 @@ PaymentMethod {
 ```
 
 ## PaymentInstallment
-
 ```
 PaymentInstallment {
     isPaid:          boolean         required
