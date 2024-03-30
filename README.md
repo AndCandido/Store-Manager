@@ -74,6 +74,7 @@ Customer {
 ```id: UUID```
 
 ```GET /customers``` -> Listar todos os clientes<br/>
+```GET /customers?customerName``` -> Listar os clientes pelo nome<br/>
 ```GET /customers/{id}``` -> Retorna o cliente específico pelo ID<br/>
 ```GET /customers/{id}/installments``` -> Retorna todas as parcelas do cliente<br/>
 ```GET /customers/{id}/installments?nonPaid=true``` -> Retorna todas as parcelas não pagas do cliente<br/>

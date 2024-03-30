@@ -57,6 +57,17 @@ public class CustomerController {
        return ResponseEntity.ok(customerResDto);
     }
 
+    @GetMapping(params = "customerName")
+    public ResponseEntity<List<CustomerResponseDto>> getCustomersByName(
+        @RequestParam() String customerName
+    ) {
+        List<Customer> customersFounded = customerService.getCustomersByName(customerName);
+        List<CustomerResponseDto> customersToResponse =
+            customersFounded.stream().map(CustomerMapper::toDtoWithoutAssociations).toList();
+
+        return ResponseEntity.ok(customersToResponse);
+    }
+
     @GetMapping("/{id}/installments")
     public ResponseEntity<List<InstallmentResponseDto>> getCustomerInstallments(
         @PathVariable UUID id,

@@ -61,6 +61,11 @@ public class CustomerServiceImpl implements ICustomerService {
     }
 
     @Override
+    public List<Customer> getCustomersByName(String customerName) {
+        return customerRepository.findByNameContaining(customerName);
+    }
+
+    @Override
     public Customer getCustomerById(UUID id) {
         return customerRepository
                 .findById(id)

@@ -22,4 +22,6 @@ public interface ICustomerService {
     boolean customerExists(UUID id);
 
     List<Installment> getCustomerInstallments(UUID customerId, boolean isInstallmentsNonPaid);
+
+    List<Customer> getCustomersByName(String customerName);
 }
