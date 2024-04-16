@@ -4,6 +4,13 @@ import io.github.AndCandido.storemanager.domain.dtos.requests.InstallmentRequest
 
 public enum InstallmentDtoFieldsValidator {
 
+    ONLY_HAVE_DUE_DATE_WHEN_NOT_PAID {
+        @Override
+        public boolean validate(InstallmentRequestDto installmentResponseDto) {
+            return installmentResponseDto.isPaid() == (installmentResponseDto.dueDate() == null);
+        }
+    },
+
     HAVE_PAYMENT_METHOD_WHEN_IS_PAID {
         @Override
         public boolean validate(InstallmentRequestDto installmentResponseDto) {

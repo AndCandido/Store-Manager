@@ -14,13 +14,16 @@ import java.time.LocalDate;
 @Builder
 @ValidateInstallmentDto.List({
     @ValidateInstallmentDto(
-        message = "{validation.installment.HavePaymentMethodWhenIsPaid}",
+        message = "{validation.installment.havePaymentMethodWhenIsPaid}",
         fieldsValidator = InstallmentDtoFieldsValidator.HAVE_PAYMENT_METHOD_WHEN_IS_PAID
+    ),
+    @ValidateInstallmentDto(
+        message = "{installment.field.dueDate.onlyHaveDueDateWhenNotPaid}",
+        fieldsValidator = InstallmentDtoFieldsValidator.ONLY_HAVE_DUE_DATE_WHEN_NOT_PAID
     )
 })
 public record InstallmentRequestDto(
 
-    @NotNull(message = "{installment.field.dueDate.null}")
     @Future(message = "{installment.field.dueDate.future}")
     LocalDate dueDate,
 

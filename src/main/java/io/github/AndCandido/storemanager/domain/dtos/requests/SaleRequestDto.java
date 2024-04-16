@@ -18,7 +18,7 @@ import java.util.UUID;
         fieldsValidator = SaleDtoFieldsValidator.INSTALLMENTS_PRICE_LESS_THAN_SALE_PRICE
     ),
     @ValidateSaleDto(
-        message = "{validation.sale.NoHaveCustomerMostBeOnlyInstallmentPaid}",
+        message = "{validation.sale.noHaveCustomerMostBeOnlyInstallmentPaid}",
         fieldsValidator = SaleDtoFieldsValidator.NO_HAVE_CUSTOMER_MUST_BE_ONLY_ONE_INSTALLMENT_PAID
     ),
 })

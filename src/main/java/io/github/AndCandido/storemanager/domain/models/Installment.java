@@ -23,7 +23,6 @@ public class Installment {
     @GeneratedValue
     private UUID id;
 
-    @Column(nullable = false)
     private LocalDate dueDate;
 
     @Column(nullable = false)
