@@ -108,7 +108,7 @@ Sale {
 ```
 Installment {
   id:             UUID
-  dueDate:        Date           Required
+  dueDate:        Date           
   price:          num            Required
   PaymentMethod:  PaymentMethod
   isPaid          boolean        Required
